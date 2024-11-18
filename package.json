@@ -8,7 +8,7 @@
 	"scripts": {
 		"start": "electron-forge start",
 		"package": "electron-forge package",
-		"make": "electron-forge make",
+		"make": "node --no-deprecation ./node_modules/@electron-forge/cli/dist/electron-forge.js make",
 		"publish": "electron-forge publish",
 		"svelte-dev": "vite -c vite/vite.renderer.config.ts",
 		"svelte-build": "vite build -c vite/vite.renderer.config.ts",
@@ -38,7 +38,7 @@
 		"lucide-svelte": "^0.460.1",
 		"postcss": "^8.4.49",
 		"svelte": "^5.2.2",
-		"svelte-check": "^4.0.8",
+		"svelte-check": "^4.0.9",
 		"tailwind-merge": "^2.5.4",
 		"tailwind-variants": "^0.3.0",
 		"tailwindcss": "^3.4.15",
@@ -55,6 +55,8 @@
 	},
 	"license": "MIT",
 	"dependencies": {
+		"@electron-toolkit/preload": "^3.0.1",
+		"@electron-toolkit/typed-ipc": "^1.0.2",
 		"electron-squirrel-startup": "^1.0.1"
 	}
 }
