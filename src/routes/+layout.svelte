@@ -6,9 +6,9 @@
 	let { children } = $props();
 
 	$effect(() => {
-		if (preferredTheme.theme === "dark")
-			window.setTitleBarColors("#374151", "#f8fafc");
-		else window.setTitleBarColors("#e5e7eb", "#020617");
+		// if (preferredTheme.theme === "dark")
+		// 	window.setTitleBarColors("#374151", "#f8fafc");
+		// else window.setTitleBarColors("#e5e7eb", "#020617");
 	});
 </script>
 

@@ -1,4 +1,4 @@
-import { app, BrowserWindow, protocol, net } from 'electron';
+import { app, BrowserWindow, protocol, net, ipcMain } from 'electron';
 import path from 'path';
 import url from 'url';
 import { stat } from 'node:fs/promises';
@@ -111,4 +111,9 @@ app.on('activate', () => {
 	if (BrowserWindow.getAllWindows().length === 0) {
 		createWindow();
 	}
+});
+
+ipcMain.on('toggleDevTools', (event) => {
+	console.log("Line 117 - main.ts - event: ", event);
+	event.sender.toggleDevTools();
 });

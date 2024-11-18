@@ -1,14 +1,25 @@
-// See the Electron documentation for details on how to use preload scripts:
-// https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
 import { contextBridge, ipcRenderer } from 'electron';
 
-export type ExposeInRendererTypes = typeof exposeInRenderer;
-const exposeInRenderer = {
-	toggleDevTools: () => ipcRenderer.send('toggleDevTools'),
-	setTitleBarColors: (bgColor: string, iconColor: string) => {
-		document.documentElement.style.background = bgColor;
-		ipcRenderer.send('setTitleBarColors', bgColor, iconColor);
-	}
-};
-
-for(const [key, value] of Object.entries(exposeInRenderer)) contextBridge.exposeInMainWorld(key, value);
+// Expose protected methods that allow the renderer process to use
+// the ipcRenderer without exposing the entire object
+contextBridge.exposeInMainWorld(
+    'api', {
+        send: (channel: string, data: any) => {
+            // whitelist channels
+            const validChannels = ['toMain'];
+            if (validChannels.includes(channel)) {
+                ipcRenderer.send(channel, data);
+            }
+        },
+        receive: (channel: string, func: (...args: any[]) => void) => {
+            const validChannels = ['fromMain'];
+            if (validChannels.includes(channel)) {
+                // Deliberately strip event as it includes `sender` 
+                ipcRenderer.on(channel, (event, ...args) => func(...args));
+            }
+        },
+        toggleDevTools: () => {
+            ipcRenderer.send('toggleDevTools');
+        }
+    }
+);

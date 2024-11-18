@@ -1,22 +1,17 @@
 /// <reference types="svelte" />
 /// <reference types="@sveltejs/kit" />
 /// <reference types="vite/client" />
-
-import type { ExposeInRendererTypes } from './preload.ts';
+/// <reference path="./lib/types/electron.d.ts" />
 
 declare global {
-	// Lets typescript know about exposed preload functions
-	interface Window extends ExposeInRendererTypes {}
-
-	// See https://kit.svelte.dev/docs/types#app
-	// for information about these interfaces
-	namespace App {
-		interface Error {}
-		// interface Locals {}
-		// interface PageData {}
-		// interface PageState {}
-		// interface Platform {}
-	}
+    // See https://kit.svelte.dev/docs/types#app
+    namespace App {
+        interface Error {}
+        // interface Locals {}
+        // interface PageData {}
+        // interface PageState {}
+        // interface Platform {}
+    }
 }
 
 export {};
