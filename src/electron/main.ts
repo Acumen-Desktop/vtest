@@ -1,8 +1,9 @@
-import { app, BrowserWindow, protocol, net, ipcMain } from 'electron';
+import { app, BrowserWindow, protocol, net } from 'electron';
 import path from 'path';
 import url from 'url';
 import { stat } from 'node:fs/promises';
 import { initDisplayData } from './utils/displayData';
+import { setupIPCHandlers } from './ipc/handlers';
 
 enum OSType {
 	Windows = 'win32',
@@ -75,28 +76,54 @@ app.on('ready', () => {
 	});
 });
 
-function createWindow() {
-	const displayData = initDisplayData();
-	console.log("Line 18 - main.ts - displayData: ", displayData);
+async function createWindow() {
+	console.log("Line 81 - main.ts - Starting window creation");
 
-	const windowOptions = {
+	const displayData = initDisplayData();
+	console.log("Line 84 - main.ts - Display data initialized:", displayData);
+
+	const mainWindow = new BrowserWindow({
 		...windowOptionsCommon,
 		...devDisplayPosition,
-	}
-	const mainWindow = new BrowserWindow({
-		...windowOptions,
+	});
+
+	// Set up IPC handlers
+	const { sendToRenderer } = setupIPCHandlers(mainWindow);
+	console.log("Line 93 - main.ts - IPC handlers set up");
+
+	// Wait for window to be ready before sending messages
+	mainWindow.once('ready-to-show', () => {
+		console.log("Line 97 - main.ts - Window ready to show");
+		mainWindow.show();
+		if (import.meta.env.DEV) mainWindow.webContents.openDevTools();
 	});
 
 	if (import.meta.env.DEV) {
 		mainWindow.loadURL(VITE_DEV_SERVER_URLS['main_window']);
-		mainWindow.webContents.openDevTools();
 	}
 	else {
 		mainWindow.loadURL('app://-/');
 	}
-	mainWindow.on('ready-to-show', () => {
-		mainWindow.show()
-	})
+
+	// Wait for the page to finish loading before sending messages
+	mainWindow.webContents.on('did-finish-load', () => {
+		console.log("Line 111 - main.ts - Page finished loading");
+		
+		// Send display error after page is loaded
+		if (displayData === undefined || displayData.Error) {
+			console.log("Line 115 - main.ts - Sending display error:", displayData?.Error);
+			sendToRenderer('fromMain', {
+				action: 'displayError',
+				error: displayData?.Error || 'Failed to initialize display data'
+			});
+		} else {
+			console.log("Line 121 - main.ts - displayData: ", displayData);
+			// TODO: Set the windowOptions to the selected display
+		}
+	});
+
+	// Send initial display data
+	sendToRenderer('test-console-log', { displayData });
 }
 
 app.on('ready', createWindow);
@@ -111,9 +138,4 @@ app.on('activate', () => {
 	if (BrowserWindow.getAllWindows().length === 0) {
 		createWindow();
 	}
-});
-
-ipcMain.on('toggleDevTools', (event) => {
-	console.log("Line 117 - main.ts - event: ", event);
-	event.sender.toggleDevTools();
 });

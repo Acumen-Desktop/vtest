@@ -26,6 +26,9 @@ export function initDisplayData() {
                     return { Left: sortedDisplays[0], Center: sortedDisplays[1], Right: sortedDisplays[2] };
                 case 4:
                     return { FarLeft: sortedDisplays[0], Left: sortedDisplays[1], Right: sortedDisplays[2], FarRight: sortedDisplays[3] };
+                case 5:
+                    return { FarLeft: sortedDisplays[0], Left: sortedDisplays[1], Center: sortedDisplays[2], Right: sortedDisplays[3], FarRight: sortedDisplays[4] };
+
                 default:
                     // For more than 4 displays, use numeric naming
                     return sortedDisplays.reduce((acc, display, index) => {
@@ -36,9 +39,9 @@ export function initDisplayData() {
         } else {
             // TODO: Add support for stacked and grid displays
             // I don't have a stacked or grid display to test with, so this is untested.
-            console.warn('LINE 37 - displayData.ts - Stacked and grid displays are not supported yet. Using primary display.');
+            console.warn('LINE 42 - displayData.ts - Stacked and grid displays are not supported yet. Using primary display.');
 
-            return { Primary: primaryDisplay }
+            return { Error: 'Stacked and grid displays are not supported yet. Using primary display.' };
         }
     }
 }
