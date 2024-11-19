@@ -5,24 +5,24 @@
 	import viteLogo from "$lib/assets/vite.svg";
 	import tailwindcssLogo from "$lib/assets/tailwindcss.svg";
 	import Counter from "$lib/components/Counter.svelte";
-	import { onMount } from "svelte";
+	// import { onMount } from "svelte";
 
-	console.log("Line 11 - +page.svelte - Component initializing");
+	// console.log("Line 11 - +page.svelte - Component initializing");
 
-	onMount(() => {
-		console.log("Line 14 - +page.svelte - Component mounted, setting up IPC listeners");
+	// onMount(() => {
+	// 	console.log("Line 14 - +page.svelte - Component mounted, setting up IPC listeners");
 
-		window.api.on("test-console-log", (message: any) => {
-			console.log("Received test-console-log:", message.displayData);
-		});
+	// 	window.api.on("test-console-log", (message: any) => {
+	// 		console.log("Received test-console-log:", message.displayData);
+	// 	});
 
-		window.api.on("fromMain", (data: any) => {
-			console.log("Line 20 - +page.svelte - Received fromMain:", data);
-			if (data.action === "displayError") {
-				console.error("Display Error:", data.error);
-			}
-		});
-	});
+	// 	window.api.on("fromMain", (data: any) => {
+	// 		console.log("Line 20 - +page.svelte - Received fromMain:", data);
+	// 		if (data.action === "displayError") {
+	// 			console.error("Display Error:", data.error);
+	// 		}
+	// 	});
+	// });
 </script>
 
 <div class="max-w-7xl mx-auto px-16 py-20">

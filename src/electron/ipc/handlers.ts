@@ -1,20 +1,37 @@
 import { ipcMain, BrowserWindow } from 'electron';
 
-export function setupIPCHandlers(mainWindow: BrowserWindow) {
-    // Function to send messages from main to renderer
-    const sendToRenderer = (channel: string, payload?: any) => {
-        console.log('Line 6 - handlers.ts - Sending to channel:', channel, 'payload:', payload);
-        mainWindow.webContents.send(channel, payload);
-    };
+export function sendFromMain(window: BrowserWindow, channel: string, payload?: any) {
+    if (!window || window.isDestroyed()) {
+        console.warn('Attempted to send to an invalid or destroyed window');
+        return;
+    }
+    console.log('Line 6 - handlers.ts - Sending to channel:', channel, 'payload:', payload);
+    window.webContents.send(channel, payload);
+};
 
-    // Handle messages from renderer process
+export function setupIPC_ReceiverHandlers(window: BrowserWindow) {
+    if (!window || window.isDestroyed()) {
+        throw new Error('Cannot setup IPC handlers with an invalid window reference');
+    }
+
+    // Function to send messages from main to renderer
+
+
+
+    // Handle messages from renderer process    
     ipcMain.on('toMain', (event, data) => {
         console.log('Received in main:', data);
+        // Get the window that sent the message
+        const senderWindow = BrowserWindow.fromWebContents(event.sender);
+        if (!senderWindow) {
+            console.warn('Could not determine sender window');
+            return;
+        }
 
         switch (data?.action) {
             case 'saveFile':
                 console.log('Saving file:', data.content);
-                sendToRenderer('saveFileResponse', {
+                sendFromMain(senderWindow, 'saveFileResponse', {
                     success: true,
                     message: 'File saved successfully'
                 });
@@ -22,20 +39,20 @@ export function setupIPCHandlers(mainWindow: BrowserWindow) {
 
             case 'getData':
                 const result = { items: ['item1', 'item2'] };
-                sendToRenderer('getDataResponse', result);
+                sendFromMain(senderWindow, 'getDataResponse', result);
                 break;
 
             case 'test-console-log':
                 console.log('Line 29 - handlers.ts - Test console log event received');
-                sendToRenderer('fromMain', {
+                sendFromMain(senderWindow, 'fromMain', {
                     success: true,
                     message: 'Test console log event handled'
                 });
                 break;
 
             case 'toggleDevTools':
-                mainWindow.webContents.toggleDevTools();
-                sendToRenderer('fromMain', {
+                senderWindow.webContents.toggleDevTools();
+                sendFromMain(senderWindow, 'fromMain', {
                     success: true,
                     message: 'DevTools toggled'
                 });
@@ -43,13 +60,13 @@ export function setupIPCHandlers(mainWindow: BrowserWindow) {
 
             default:
                 console.log('Unknown action:', data?.action);
-                sendToRenderer('error', {
+                sendFromMain(senderWindow, 'error', {
                     success: false,
                     error: 'Unknown action'
                 });
         }
     });
 
-    // Return the sender function so it can be used elsewhere in main process
-    return { sendToRenderer };
+    // Return the sendFromMain function for convenience
+    return { sendFromMain };
 }

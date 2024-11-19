@@ -9,15 +9,17 @@ export function initDisplayData() {
     if (sortedDisplays.length === 1) {
         return { Primary: primaryDisplay };
     } else {
-        // test if all 'y' values are 0, this means the displays are in a row, else stacked or grid.
+        // test if all 'y' values close together, this means the displays are in a row, else stacked or grid.
         let isDisplayRow = true;
-        for (let i = 1; i < sortedDisplays.length; i++) {
-            if (sortedDisplays[i].workArea.y !== 0) {
+        let rowYvalue = sortedDisplays[0].workArea.y;
+        for (let i = 0; i < sortedDisplays.length; i++) {
+            const yDifference = Math.abs(sortedDisplays[i].workArea.y - rowYvalue);
+            if (yDifference > 100) {
                 isDisplayRow = false;
                 break;
             }
         }
-
+        // isDisplayRow = false; for testing
         if (isDisplayRow) {
             switch (sortedDisplays.length) {
                 case 2:
@@ -39,9 +41,7 @@ export function initDisplayData() {
         } else {
             // TODO: Add support for stacked and grid displays
             // I don't have a stacked or grid display to test with, so this is untested.
-            console.warn('LINE 42 - displayData.ts - Stacked and grid displays are not supported yet. Using primary display.');
-
-            return { Error: 'Stacked and grid displays are not supported yet. Using primary display.' };
+            throw new Error(`Stacked and grid displays are not supported yet. Displays are: ${JSON.stringify(sortedDisplays)}`);
         }
     }
 }
