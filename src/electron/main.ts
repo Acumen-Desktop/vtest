@@ -28,14 +28,16 @@ const windowOptionsCommon = {
 	minHeight: 200,
 	backgroundColor: '#374151',
 	autoHideMenuBar: true,
-	show: false,
 	webPreferences: {
+		show: false,
 		sandbox: true,
 		contextIsolation: true,
 		nodeIntegration: false,
 		preload: path.join(import.meta.dirname, '../preload/preload.js'),
 	},
 };
+
+let displayData: ReturnType<typeof initDisplayData> = {};
 
 // TODO: Research this
 protocol.registerSchemesAsPrivileged([{
@@ -56,27 +58,27 @@ protocol.registerSchemesAsPrivileged([{
 // import { dev } from '$app/environment';
 // if (electronSquirrelStartup) app.quit();
 
-async function createWindow() {
+async function createMainWindow() {
 	const windowManager = WindowManager.getInstance();
 	const mainWindow = windowManager.createWindow({
 		id: 'main',
 		options: windowOptionsCommon
 	});
 
-	try {
-		const displayData = initDisplayData();
-		// TODO: Set the windowOptions to the right most display, unless there is a user preference.
-		if (displayData) {
-			const lastDisplay = Object.values(displayData).at(-1);
-			if (lastDisplay) mainWindow.setBounds(lastDisplay.workArea);
-		}
-	} catch (error) {
-		console.log("Line 90 - main.ts - Display Error:", error);
-		windowManager.sendToWindow('main', 'fromMain', {
-			action: 'log-data',
-			error
-		});
+	// try {
+	// const displayData = initDisplayData();
+	// TODO: Set the windowOptions to the right most display, unless there is a user preference.
+	if (displayData) {
+		const lastDisplay = Object.values(displayData).at(-1);
+		if (lastDisplay) mainWindow.setBounds(lastDisplay.workArea);
 	}
+	// } catch (error) {
+	// 	console.log("Line 90 - main.ts - Display Error:", error);
+	// 	windowManager.sendToWindow('main', 'fromMain', {
+	// 		action: 'log-data',
+	// 		error
+	// 	});
+	// }
 
 	mainWindow.once('ready-to-show', () => {
 		mainWindow.show();
@@ -89,8 +91,66 @@ async function createWindow() {
 	else {
 		mainWindow.loadURL('app://-/');
 	}
-
+	setupIPC_ReceiverHandlers(mainWindow);
 	getAppPath(mainWindow);
+}
+
+export async function createSettingsWindow() {
+	// console.log('Line 97 - main.ts - Creating settings window...');
+	const windowManager = WindowManager.getInstance();
+
+	// Check if window already exists
+	const existingWindow = windowManager.getWindow('settings');
+	if (existingWindow) {
+		console.log('Settings window already exists, showing it');
+		windowManager.setWindowVisibility('settings', true);
+		return existingWindow;
+	}
+
+	const settingsOptions = {
+		...windowOptionsCommon,
+		width: 800,
+		height: 600,
+	}
+	// console.log('Creating settings window with options:', settingsOptions);
+	const settingsWindow = windowManager.createWindow({
+		id: 'settings',
+		options: { ...settingsOptions }
+	});
+	try {
+		if (displayData) {
+			// console.log("Line 114 - main.ts - displayData: ", displayData);
+			const firstDisplay = Object.values(displayData)[0];
+			if (firstDisplay) {
+				console.log('Line 125 - main.ts - Setting bounds for settings window:', firstDisplay.workArea);
+				settingsWindow.setBounds(firstDisplay.workArea);
+			}
+		}
+	} catch (error) {
+		console.log("Line 130 - main.ts - Display Error:", error);
+		windowManager.sendToWindow('main', 'fromMain', {
+			action: 'log-data',
+			error
+		});
+	}
+
+	// settingsWindow.once('ready-to-show', () => {
+	// 	console.log('Settings window ready to show');
+	// 	settingsWindow.show();
+	// 	if (import.meta.env.DEV) {
+	// 		console.log('Opening DevTools for settings window');
+	// 		settingsWindow.webContents.openDevTools();
+	// 	}
+	// });
+
+	// Add URL loading
+	if (import.meta.env.DEV) {
+		console.log('Line 148 - main.ts - Loading settings window URL in DEV mode');
+		settingsWindow.loadURL(`${VITE_DEV_SERVER_URLS['main_window']}/settings`);
+	} else {
+		console.log('Line 153 - main.ts - Loading settings window URL in PROD mode');
+		settingsWindow.loadURL('app://-/settings');
+	}
 }
 
 if (!app.requestSingleInstanceLock()) {
@@ -105,17 +165,17 @@ app.on('window-all-closed', () => {
 
 app.on('activate', () => {
 	if (BrowserWindow.getAllWindows().length === 0) {
-		createWindow();
+		createMainWindow();
 	}
 });
 
 
 app.on('second-instance', (event, args, workingDirectory, additionalData) => {
-	createWindow();
+	createMainWindow();
 });
 
-app.on('ready', () => {
-
+app.on('ready', async () => {
+	const windowManager = WindowManager.getInstance();
 	protocol.handle(scheme, async (request) => {
 		const requestPath = path.normalize(decodeURIComponent(new URL(request.url).pathname));
 
@@ -133,5 +193,42 @@ app.on('ready', () => {
 		return await net.fetch(url.pathToFileURL(responseFilePath).toString());
 	});
 
-	createWindow();
+	try {
+		displayData = initDisplayData();
+		// TODO: Set the windowOptions to the right most display, unless there is a user preference.
+		// if (displayData) {
+		// 	const lastDisplay = Object.values(displayData).at(-1);
+		// 	if (lastDisplay) mainWindow.setBounds(lastDisplay.workArea);
+		// }
+	} catch (error) {
+		console.log("Line 90 - main.ts - Display Error:", error);
+		windowManager.sendToWindow('main', 'fromMain', {
+			action: 'log-data',
+			error
+		});
+	}
+	await createMainWindow();
+	await createSettingsWindow();
+	// Send messages
+	windowManager.sendToWindow('settings', 'updateConfig', { theme: 'dark' });
+	windowManager.broadcastToAll('systemUpdate', { version: '1.0.1' });
+
+	// Manage windows
+	windowManager.setWindowVisibility('settings', false); // Hide settings
+	windowManager.restoreWindowState('main'); // Restore main window position/size
+
+	// Get window references
+	const windowsInfo = windowManager.getAllWindowsInfo();
+	// console.log("Windows:", windowsInfo.map(({ id, window }) => ({
+	// 	id,
+	// 	bounds: window.getBounds(),
+	// 	isVisible: window.isVisible()
+	// })));
+
+	const mainWindowRef = windowManager.getWindow('main');
+	// console.log("Main Window:", mainWindowRef ? {
+	// 	id: 'main',
+	// 	bounds: mainWindowRef.getBounds(),
+	// 	isVisible: mainWindowRef.isVisible()
+	// } : 'not found');
 });

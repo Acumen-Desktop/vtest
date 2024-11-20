@@ -16,24 +16,24 @@ ipcRenderer.on('fromMain', (_event, data) => {
 contextBridge.exposeInMainWorld(
     'api', {
     // TODO: This seems overly complex
-    // send: (channel: string, data: any) => {
-    //     // whitelist channels
-    //     const validChannels = ['toMain'];
-    //     if (validChannels.includes(channel)) {
-    //         ipcRenderer.send(channel, data);
-    //     }
-    // },
-    // on: (channel: string, callback: Function) => {
-    //     console.log('Line 19 - preload.ts - Setting up listener for channel:', channel);
-    //     const validChannels = ['test-console-log', 'fromMain', 'toggleDevToolsResponse'];
-    //     if (validChannels.includes(channel)) {
-    //         console.log('Line 22 - preload.ts - Channel is valid:', channel);
-    //         ipcRenderer.on(channel, (_event, data) => {
-    //             console.log('Line 24 - preload.ts - Received on channel:', channel, 'data:', data);
-    //             callback(data);
-    //         });
-    //     }
-    // },
+    send: (channel: string, data: any) => {
+        // whitelist channels
+        const validChannels = ['toMain'];
+        if (validChannels.includes(channel)) {
+            ipcRenderer.send(channel, data);
+        }
+    },
+    on: (channel: string, callback: Function) => {
+        console.log('Line 19 - preload.ts - Setting up listener for channel:', channel);
+        const validChannels = ['test-console-log', 'fromMain', 'toggleDevToolsResponse'];
+        if (validChannels.includes(channel)) {
+            console.log('Line 22 - preload.ts - Channel is valid:', channel);
+            ipcRenderer.on(channel, (_event, data) => {
+                console.log('Line 24 - preload.ts - Received on channel:', channel, 'data:', data);
+                callback(data);
+            });
+        }
+    },
     toggleDevTools: () => {
         ipcRenderer.send('toMain', { action: 'toggleDevTools' });
     }

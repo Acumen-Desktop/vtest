@@ -1,4 +1,5 @@
-import { BrowserWindow, Rectangle } from 'electron';
+import { BrowserWindow } from 'electron';
+import type { Rectangle } from 'electron';
 import { sendFromMain } from '../ipc/handlers';
 
 export type WindowConfig = {
@@ -16,19 +17,22 @@ export class WindowManager {
     private constructor() {
         this.windows = new Map();
         this.windowConfigs = new Map();
+        // console.log('WindowManager initialized');
     }
 
     public static getInstance(): WindowManager {
         if (!WindowManager.instance) {
             WindowManager.instance = new WindowManager();
+            // console.log('Created new WindowManager instance');
         }
         return WindowManager.instance;
     }
 
     public createWindow(config: WindowConfig): BrowserWindow {
+        // console.log('Creating window with config:', config);
         const existingWindow = this.windows.get(config.id);
         if (existingWindow) {
-            console.warn(`Window with id ${config.id} already exists. Returning existing window.`);
+            // console.warn(`Window with id ${config.id} already exists. Returning existing window.`);
             return existingWindow;
         }
 
@@ -39,9 +43,11 @@ export class WindowManager {
 
         this.windows.set(config.id, window);
         this.windowConfigs.set(config.id, config);
+        // console.log(`Window ${config.id} created. Total windows:`, this.windows.size);
 
         // Setup window event handlers
         window.on('closed', () => {
+            // console.log(`Window ${config.id} closed`);
             this.windows.delete(config.id);
             this.windowConfigs.delete(config.id);
         });
@@ -60,11 +66,21 @@ export class WindowManager {
     }
 
     public getWindow(id: string): BrowserWindow | undefined {
-        return this.windows.get(id);
+        const window = this.windows.get(id);
+        // console.log(`Getting window ${id}:`, window ? 'found' : 'not found');
+        return window;
     }
 
     public getAllWindows(): BrowserWindow[] {
         return Array.from(this.windows.values());
+    }
+
+    public getAllWindowsInfo(): { id: string; window: BrowserWindow }[] {
+        // console.log('Getting all windows info. Current windows:', Array.from(this.windows.keys()));
+        return Array.from(this.windows.entries()).map(([id, window]) => ({
+            id,
+            window
+        }));
     }
 
     public getWindowIds(): string[] {

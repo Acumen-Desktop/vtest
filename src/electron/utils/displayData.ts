@@ -19,7 +19,7 @@ export function initDisplayData() {
                 break;
             }
         }
-        // isDisplayRow = false; for testing
+        isDisplayRow = false; //for testing
         if (isDisplayRow) {
             switch (sortedDisplays.length) {
                 case 2:

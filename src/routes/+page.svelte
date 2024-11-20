@@ -5,27 +5,56 @@
 	import viteLogo from "$lib/assets/vite.svg";
 	import tailwindcssLogo from "$lib/assets/tailwindcss.svg";
 	import Counter from "$lib/components/Counter.svelte";
-	// import { onMount } from "svelte";
+	import { onMount } from "svelte";
 
-	// console.log("Line 11 - +page.svelte - Component initializing");
+	let isSettingsVisible = false;
 
-	// onMount(() => {
-	// 	console.log("Line 14 - +page.svelte - Component mounted, setting up IPC listeners");
+	onMount(() => {
+		console.log(
+			"Line 14 - +page.svelte - Component mounted, setting up IPC listeners",
+		);
 
-	// 	window.api.on("test-console-log", (message: any) => {
-	// 		console.log("Received test-console-log:", message.displayData);
-	// 	});
+		// Listen for window visibility updates
+		window.api.on(
+			"windowVisibility",
+			(data: { windowId: string; isVisible: boolean }) => {
+				console.log("Line 21 - +page.svelte - data: ", data);
+				if (data.windowId === "settings") {
+					isSettingsVisible = data.isVisible;
+				}
+			},
+		);
 
-	// 	window.api.on("fromMain", (data: any) => {
-	// 		console.log("Line 20 - +page.svelte - Received fromMain:", data);
-	// 		if (data.action === "displayError") {
-	// 			console.error("Display Error:", data.error);
-	// 		}
-	// 	});
-	// });
+		window.api.on("test-console-log", (message: any) => {
+			console.log("Received test-console-log:", message.displayData);
+		});
+
+		window.api.on("fromMain", (data: any) => {
+			console.log("Line 33 - +page.svelte - Received fromMain:", data);
+			if (data.action === "displayError") {
+				console.error("Display Error:", data.error);
+			}
+		});
+	});
+
+	function toggleSettings() {
+		console.log("Line 35 - +page.svelte - toggleSettings:");
+		window.api.send("toMain", {
+			action: "toggleWindow",
+			windowId: "settings",
+		});
+	}
 </script>
 
 <div class="max-w-7xl mx-auto px-16 py-20">
+	<div class="flex justify-center mb-8">
+		<button
+			on:click={toggleSettings}
+			class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+		>
+			{isSettingsVisible ? "Hide" : "Show"} Settings
+		</button>
+	</div>
 	<div
 		class="flex gap-16 flex-wrap justify-center *:shrink-0 *:transition *:duration-500 [&>*:hover]:duration-100"
 	>
