@@ -8,6 +8,7 @@ import { getAppPath } from './utils/pathData';
 import { get } from 'svelte/store';
 import { WindowManager } from './utils/windowManager';
 import { StorageManager } from './utils/storageManager';
+import { createMenu } from './menu';
 
 enum OSType {
 	Windows = 'win32',
@@ -29,6 +30,7 @@ const windowOptionsCommon = {
 	minHeight: 200,
 	backgroundColor: '#374151',
 	autoHideMenuBar: true,
+	frame: true,
 	webPreferences: {
 		show: false,
 		sandbox: true,
@@ -172,7 +174,9 @@ app.on('second-instance', (event, args, workingDirectory, additionalData) => {
 	createMainWindow();
 });
 
-app.on('ready', async () => {
+app.whenReady().then(async () => {
+	console.log("Line 13 - main.ts - Application ready, initializing components");
+	createMenu();
 	const windowManager = WindowManager.getInstance();
 	const storageManager = StorageManager.getInstance();
 
