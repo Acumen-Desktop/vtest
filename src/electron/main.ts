@@ -7,6 +7,7 @@ import { sendFromMain, setupIPC_ReceiverHandlers } from './ipc/handlers';
 import { getAppPath } from './utils/pathData';
 import { get } from 'svelte/store';
 import { WindowManager } from './utils/windowManager';
+import { StorageManager } from './utils/storageManager';
 
 enum OSType {
 	Windows = 'win32',
@@ -62,23 +63,12 @@ async function createMainWindow() {
 	const windowManager = WindowManager.getInstance();
 	const mainWindow = windowManager.createWindow({
 		id: 'main',
-		options: windowOptionsCommon
+		options: windowOptionsCommon,
+		userOptions: {}  // Placeholder for user-defined options
 	});
 
-	// try {
-	// const displayData = initDisplayData();
-	// TODO: Set the windowOptions to the right most display, unless there is a user preference.
-	if (displayData) {
-		const lastDisplay = Object.values(displayData).at(-1);
-		if (lastDisplay) mainWindow.setBounds(lastDisplay.workArea);
-	}
-	// } catch (error) {
-	// 	console.log("Line 90 - main.ts - Display Error:", error);
-	// 	windowManager.sendToWindow('main', 'fromMain', {
-	// 		action: 'log-data',
-	// 		error
-	// 	});
-	// }
+	// Restore window state or position on rightmost display
+	windowManager.restoreWindowState('main');
 
 	mainWindow.once('ready-to-show', () => {
 		mainWindow.show();
@@ -92,7 +82,7 @@ async function createMainWindow() {
 		mainWindow.loadURL('app://-/');
 	}
 	setupIPC_ReceiverHandlers(mainWindow);
-	getAppPath(mainWindow);
+	console.log("Line 96 - main.ts - App Path: ", getAppPath(mainWindow));
 }
 
 export async function createSettingsWindow() {
@@ -119,10 +109,10 @@ export async function createSettingsWindow() {
 	});
 	try {
 		if (displayData) {
-			// console.log("Line 114 - main.ts - displayData: ", displayData);
+			// console.log("Line 123 - main.ts - displayData: ", displayData);
 			const firstDisplay = Object.values(displayData)[0];
 			if (firstDisplay) {
-				console.log('Line 125 - main.ts - Setting bounds for settings window:', firstDisplay.workArea);
+				// console.log('Line 126 - main.ts - Setting bounds for settings window:', firstDisplay.workArea);
 				settingsWindow.setBounds(firstDisplay.workArea);
 			}
 		}
@@ -169,6 +159,14 @@ app.on('activate', () => {
 	}
 });
 
+// Save window states before quitting
+app.on('before-quit', () => {
+	const windowManager = WindowManager.getInstance();
+	const windows = windowManager.getAllWindowsInfo();
+	windows.forEach(({ id }) => {
+		windowManager.saveWindowState(id);
+	});
+});
 
 app.on('second-instance', (event, args, workingDirectory, additionalData) => {
 	createMainWindow();
@@ -176,6 +174,11 @@ app.on('second-instance', (event, args, workingDirectory, additionalData) => {
 
 app.on('ready', async () => {
 	const windowManager = WindowManager.getInstance();
+	const storageManager = StorageManager.getInstance();
+
+	// Log the storage path for inspection
+	console.log('App userData path:', app.getPath('userData'));
+
 	protocol.handle(scheme, async (request) => {
 		const requestPath = path.normalize(decodeURIComponent(new URL(request.url).pathname));
 
@@ -195,20 +198,23 @@ app.on('ready', async () => {
 
 	try {
 		displayData = initDisplayData();
-		// TODO: Set the windowOptions to the right most display, unless there is a user preference.
-		// if (displayData) {
-		// 	const lastDisplay = Object.values(displayData).at(-1);
-		// 	if (lastDisplay) mainWindow.setBounds(lastDisplay.workArea);
-		// }
+		console.log("Line 212 - main.ts - displayData: ", displayData);
+
 	} catch (error) {
-		console.log("Line 90 - main.ts - Display Error:", error);
-		windowManager.sendToWindow('main', 'fromMain', {
-			action: 'log-data',
-			error
-		});
+		console.error('Line 215 - main.ts - Error initializing display data:', error);
+		setTimeout(() => {
+			const mainWindow = windowManager.getWindow('main');
+			if (mainWindow) {
+				console.log("Line 219 - main.ts - mainWindow.id: ", mainWindow.id);
+				sendFromMain(mainWindow, 'fromMain', {
+					action: 'log-data',
+					error
+				});
+			}
+		}, 5000);
 	}
-	await createMainWindow();
-	await createSettingsWindow();
+	createMainWindow();
+	createSettingsWindow();
 	// Send messages
 	windowManager.sendToWindow('settings', 'updateConfig', { theme: 'dark' });
 	windowManager.broadcastToAll('systemUpdate', { version: '1.0.1' });

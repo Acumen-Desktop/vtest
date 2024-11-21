@@ -6,54 +6,74 @@
 	import tailwindcssLogo from "$lib/assets/tailwindcss.svg";
 	import Counter from "$lib/components/Counter.svelte";
 	import { onMount } from "svelte";
+	import { Button } from "$lib/components/ui/button/index.js";
+	import Mail from "lucide-svelte/icons/mail";
 
 	let isSettingsVisible = false;
 
 	onMount(() => {
-		console.log(
-			"Line 14 - +page.svelte - Component mounted, setting up IPC listeners",
-		);
-
 		// Listen for window visibility updates
 		window.api.on(
 			"windowVisibility",
 			(data: { windowId: string; isVisible: boolean }) => {
-				console.log("Line 21 - +page.svelte - data: ", data);
 				if (data.windowId === "settings") {
 					isSettingsVisible = data.isVisible;
+					console.log(
+						"Settings visibility updated:",
+						isSettingsVisible,
+					);
 				}
 			},
 		);
 
 		window.api.on("test-console-log", (message: any) => {
-			console.log("Received test-console-log:", message.displayData);
+			console.log(
+				"Line 26 - +page.svelte - Received test-console-log:",
+				message.displayData,
+			);
 		});
 
 		window.api.on("fromMain", (data: any) => {
-			console.log("Line 33 - +page.svelte - Received fromMain:", data);
-			if (data.action === "displayError") {
-				console.error("Display Error:", data.error);
+			if (data.action === "log-data") {
+				console.error(
+					"Line 31 - +page.svelte - Display Error:",
+					data.error,
+				);
 			}
 		});
 	});
 
-	function toggleSettings() {
-		console.log("Line 35 - +page.svelte - toggleSettings:");
-		window.api.send("toMain", {
-			action: "toggleWindow",
-			windowId: "settings",
-		});
+	async function toggleSettings() {
+		try {
+			const result = await window.api.invoke("toggleWindow", {
+				windowId: "settings",
+			});
+
+			if (result.success) {
+				isSettingsVisible = result.isVisible;
+			} else {
+				console.error(
+					"Line 41 - +page.svelte - Failed to toggle settings window:",
+					result.error,
+				);
+			}
+		} catch (error) {
+			console.error("Line 46 - +page.svelte - toggling settings:", error);
+		}
 	}
 </script>
 
 <div class="max-w-7xl mx-auto px-16 py-20">
 	<div class="flex justify-center mb-8">
-		<button
-			on:click={toggleSettings}
-			class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-		>
+		<Button onclick={toggleSettings}>
 			{isSettingsVisible ? "Hide" : "Show"} Settings
-		</button>
+		</Button>
+		<Button
+			onclick={() => console.log("Line 67 - +page.svelte - clicked: ")}
+		>
+			<Mail class="mr-2 size-4" />
+			Login with Email
+		</Button>
 	</div>
 	<div
 		class="flex gap-16 flex-wrap justify-center *:shrink-0 *:transition *:duration-500 [&>*:hover]:duration-100"
