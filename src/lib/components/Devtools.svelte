@@ -1,11 +1,45 @@
-<button
-	class="w-11 h-full grid place-content-center hover:bg-black/15 fill-slate-950 hover:fill-black dark:hover:bg-white/15 dark:fill-slate-50 dark:hover:fill-white"
-	onclick={window.api.toggleDevTools}
-	aria-label="Toggle developer tools"
->
-	<svg class="w-4 h-4" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-		<path
-			d="M7 15L2 10L7 5L8.062 6.062L4.125 10L8.062 13.938L7 15ZM13 15L11.938 13.938L15.875 10L11.938 6.062L13 5L18 10L13 15Z"
-		/>
-	</svg>
-</button>
+<script lang="ts">
+	import { Button } from "$lib/components/ui/button";
+	import Icon from "$lib/components/Icon.svelte";
+	import { onMount } from "svelte";
+	import { writable } from "svelte/store";
+
+	// Create a store for panel states
+	const panelState = writable<Record<string, boolean>>({});
+
+	onMount(async () => {
+		// Get the initial panel states from config
+		try {
+			const response = await window.api.invoke("getPanelStates");
+			if (response.success) {
+				// Update both the local state and the store
+				isDevToolsOpen = response.panelStates.devTools ?? false;
+				panelState.set(response.panelStates);
+			}
+		} catch (error) {
+			console.error("Failed to get initial panel states:", error);
+		}
+	});
+
+	let isDevToolsOpen = false;
+
+	async function toggleDevtools() {
+		try {
+			const newState = !isDevToolsOpen;
+			const result = await window.api.invoke("toggleDevTools", {
+				panelId: "devTools",
+				isOpen: newState,
+			});
+
+			if (result.success) {
+				isDevToolsOpen = newState;
+			}
+		} catch (error) {
+			console.error("Failed to toggle devtools:", error);
+		}
+	}
+</script>
+
+<Button onclick={toggleDevtools} variant="ghost" size="sm" class="title-button">
+	<Icon name={isDevToolsOpen ? "debug" : "bug"} />
+</Button>

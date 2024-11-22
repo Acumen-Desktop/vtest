@@ -63,7 +63,7 @@
 	}
 </script>
 
-<div class="max-w-7xl mx-auto px-16 py-20">
+<div id="mainPage" class="max-w-7xl mx-auto px-16 py-20">
 	<div class="flex justify-center mb-8">
 		<Button onclick={toggleSettings}>
 			{isSettingsVisible ? "Hide" : "Show"} Settings

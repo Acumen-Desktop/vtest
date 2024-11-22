@@ -15,7 +15,8 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"test": "vitest",
-		"update:deps": "npx npm-check-updates -u && npm install"
+		"update:deps": "npx npm-check-updates -u && npm install",
+		"copy-icon": "tsx src/lib/utils/copy-icons.ts"
 	},
 	"devDependencies": {
 		"@electron-forge/cli": "^7.5.0",
@@ -31,19 +32,19 @@
 		"@sveltejs/vite-plugin-svelte": "^4.0.1",
 		"@types/electron-squirrel-startup": "^1.0.2",
 		"autoprefixer": "^10.4.20",
-		"bits-ui": "^1.0.0-next.58",
+		"bits-ui": "^1.0.0-next.63",
 		"clsx": "^2.1.1",
 		"electron": "33.2.0",
 		"globals": "^15.12.0",
 		"lucide-svelte": "^0.460.1",
 		"postcss": "^8.4.49",
-		"svelte": "^5.2.2",
+		"svelte": "^5.2.7",
 		"svelte-check": "^4.0.9",
 		"tailwind-merge": "^2.5.4",
 		"tailwind-variants": "^0.3.0",
 		"tailwindcss": "^3.4.15",
 		"tailwindcss-animate": "^1.0.7",
-		"ts-node": "^10.9.2",
+		"tsx": "^3.14.0",
 		"typescript": "^5.6.3",
 		"vite": "^5.4.11",
 		"vitest": "^2.1.5"
@@ -57,6 +58,7 @@
 	"dependencies": {
 		"@electron-toolkit/preload": "^3.0.1",
 		"@electron-toolkit/typed-ipc": "^1.0.2",
+		"@vscode/codicons": "^0.0.36",
 		"electron-better-ipc": "^2.0.1",
 		"electron-squirrel-startup": "^1.0.1"
 	}

@@ -7,7 +7,13 @@ export interface StoredWindowConfig {
     bounds?: Electron.Rectangle;
     isVisible?: boolean;
     displayId?: string;
-    userOptions?: Partial<Electron.BrowserWindowConstructorOptions>;  // Only store user-defined options
+    userOptions?: Partial<Electron.BrowserWindowConstructorOptions>;
+    panels?: {
+        devTools: boolean;
+        settings: boolean;
+        inspector: boolean;
+        [key: string]: boolean;  // Allow for future panel additions
+    };
 }
 
 export interface StoredDisplayConfig {

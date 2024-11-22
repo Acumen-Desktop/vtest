@@ -9,6 +9,8 @@ import { get } from 'svelte/store';
 import { WindowManager } from './utils/windowManager';
 import { StorageManager } from './utils/storageManager';
 import { createMenu } from './menu';
+import { initializeConfig, updatePanelState } from './utils/initConfig';
+import { type StoredDisplayConfig } from './utils/storageManager';
 
 enum OSType {
 	Windows = 'win32',
@@ -30,7 +32,14 @@ const windowOptionsCommon = {
 	minHeight: 200,
 	backgroundColor: '#374151',
 	autoHideMenuBar: true,
-	frame: true,
+	titleBarStyle: 'hiddenInset',
+	// 'default', 'hiddenInset', 'hidden', 'customButtonsOnHover',
+	// all but default create an error: 'textured' window type deprecated
+	titleBarOverlay: {
+		color: '#374151',
+		symbolColor: '#ffffff',
+		height: 35
+	},
 	webPreferences: {
 		show: false,
 		sandbox: true,
@@ -40,7 +49,7 @@ const windowOptionsCommon = {
 	},
 };
 
-let displayData: ReturnType<typeof initDisplayData> = {};
+let displayData: StoredDisplayConfig[] | Record<string, StoredDisplayConfig> = {};
 
 // TODO: Research this
 protocol.registerSchemesAsPrivileged([{
@@ -83,8 +92,7 @@ async function createMainWindow() {
 	else {
 		mainWindow.loadURL('app://-/');
 	}
-	setupIPC_ReceiverHandlers(mainWindow);
-	console.log("Line 96 - main.ts - App Path: ", getAppPath(mainWindow));
+	return mainWindow;
 }
 
 export async function createSettingsWindow() {
@@ -103,6 +111,11 @@ export async function createSettingsWindow() {
 		...windowOptionsCommon,
 		width: 800,
 		height: 600,
+		show: false,
+		webPreferences: {
+			nodeIntegration: false,
+			preload: path.join(import.meta.dirname, '../preload/preload.js'),
+		},
 	}
 	// console.log('Creating settings window with options:', settingsOptions);
 	const settingsWindow = windowManager.createWindow({
@@ -112,7 +125,10 @@ export async function createSettingsWindow() {
 	try {
 		if (displayData) {
 			// console.log("Line 123 - main.ts - displayData: ", displayData);
-			const firstDisplay = Object.values(displayData)[0];
+			const firstDisplay = Array.isArray(displayData)
+				? displayData[0]
+				: Object.values(displayData)[0];
+
 			if (firstDisplay) {
 				// console.log('Line 126 - main.ts - Setting bounds for settings window:', firstDisplay.workArea);
 				settingsWindow.setBounds(firstDisplay.workArea);
@@ -143,6 +159,7 @@ export async function createSettingsWindow() {
 		console.log('Line 153 - main.ts - Loading settings window URL in PROD mode');
 		settingsWindow.loadURL('app://-/settings');
 	}
+	return settingsWindow;
 }
 
 if (!app.requestSingleInstanceLock()) {
@@ -175,70 +192,40 @@ app.on('second-instance', (event, args, workingDirectory, additionalData) => {
 });
 
 app.whenReady().then(async () => {
-	console.log("Line 13 - main.ts - Application ready, initializing components");
-	createMenu();
-	const windowManager = WindowManager.getInstance();
-	const storageManager = StorageManager.getInstance();
-
-	// Log the storage path for inspection
-	console.log('App userData path:', app.getPath('userData'));
-
-	protocol.handle(scheme, async (request) => {
-		const requestPath = path.normalize(decodeURIComponent(new URL(request.url).pathname));
-
-		async function isFile(filePath: string) {
-			try {
-				if ((await stat(filePath)).isFile()) return filePath;
-			}
-			catch (e) { }
-		}
-
-		const responseFilePath = await isFile(path.join(srcFolder, requestPath))
-			?? await isFile(path.join(srcFolder, path.dirname(requestPath), `${path.basename(requestPath) || 'index'}.html`))
-			?? path.join(srcFolder, '200.html');
-
-		return await net.fetch(url.pathToFileURL(responseFilePath).toString());
-	});
-
 	try {
-		displayData = initDisplayData();
-		console.log("Line 212 - main.ts - displayData: ", displayData);
+		// Initialize configuration and display data
+		const config = await initializeConfig();
+		displayData = config.displays;
 
-	} catch (error) {
-		console.error('Line 215 - main.ts - Error initializing display data:', error);
-		setTimeout(() => {
-			const mainWindow = windowManager.getWindow('main');
-			if (mainWindow) {
-				console.log("Line 219 - main.ts - mainWindow.id: ", mainWindow.id);
-				sendFromMain(mainWindow, 'fromMain', {
-					action: 'log-data',
-					error
-				});
+		// Create windows with initialized config
+		const mainWindow = await createMainWindow();
+		const settingsWindow = await createSettingsWindow();
+
+		// Set up IPC handlers
+		setupIPC_ReceiverHandlers(mainWindow);
+		setupIPC_ReceiverHandlers(settingsWindow);
+
+		// Create application menu
+		createMenu();
+
+		protocol.handle('app', async (request) => {
+			const requestPath = path.normalize(decodeURIComponent(new URL(request.url).pathname));
+
+			async function isFile(filePath: string) {
+				try {
+					if ((await stat(filePath)).isFile()) return filePath;
+				}
+				catch (e) { }
 			}
-		}, 5000);
+
+			const responseFilePath = await isFile(path.join(srcFolder, requestPath))
+				?? await isFile(path.join(srcFolder, path.dirname(requestPath), `${path.basename(requestPath) || 'index'}.html`))
+				?? path.join(srcFolder, '200.html');
+
+			return await net.fetch(url.pathToFileURL(responseFilePath).toString());
+		});
+	} catch (error) {
+		console.error('Failed to initialize app:', error);
+		app.quit();
 	}
-	createMainWindow();
-	createSettingsWindow();
-	// Send messages
-	windowManager.sendToWindow('settings', 'updateConfig', { theme: 'dark' });
-	windowManager.broadcastToAll('systemUpdate', { version: '1.0.1' });
-
-	// Manage windows
-	windowManager.setWindowVisibility('settings', false); // Hide settings
-	windowManager.restoreWindowState('main'); // Restore main window position/size
-
-	// Get window references
-	const windowsInfo = windowManager.getAllWindowsInfo();
-	// console.log("Windows:", windowsInfo.map(({ id, window }) => ({
-	// 	id,
-	// 	bounds: window.getBounds(),
-	// 	isVisible: window.isVisible()
-	// })));
-
-	const mainWindowRef = windowManager.getWindow('main');
-	// console.log("Main Window:", mainWindowRef ? {
-	// 	id: 'main',
-	// 	bounds: mainWindowRef.getBounds(),
-	// 	isVisible: mainWindowRef.isVisible()
-	// } : 'not found');
 });

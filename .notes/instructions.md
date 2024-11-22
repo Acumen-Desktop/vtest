@@ -61,6 +61,43 @@ Current valid IPC channels:
 - Document all state dependencies
 - Use reactive statements for derived state
 
+## UI Components and Design
+All UI components should follow the shadcn-svelte component library standards. The complete documentation for shadcn-svelte components can be found at:
+`.notes/shadcn-svelte-docs.md`
+
+Key points for UI development:
+- Use shadcn-svelte components whenever possible
+- Follow the component usage examples from the documentation
+- Maintain consistent styling using Tailwind CSS
+- Ensure accessibility compliance
+- Support both light and dark themes
+
+## Icons
+The project uses VS Code Codicons for icons. You can browse the complete list of available icons at:
+https://microsoft.github.io/vscode-codicons/dist/codicon.html
+
+Also lucide-svelte has a great collection of icons for Svelte:
+https://lucide.dev/icons/
+
+### Adding New Icons
+1. Find the icon you want to use in the Codicons gallery
+2. Copy the icon name (without the 'codicon-' prefix)
+3. Run the copy script:
+```bash
+npm run copy-icon <icon-name>
+```
+Example:
+```bash
+npm run copy-icon bug    # Copies the bug icon
+npm run copy-icon folder # Copies the folder icon
+```
+
+### Using Icons in Components
+Once copied, use the Icon component to display the icon:
+```svelte
+<Icon name="bug" />
+```
+
 ## Development Workflow
 
 ### Running the Application

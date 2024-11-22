@@ -323,4 +323,70 @@ export class WindowManager {
             }
         }
     }
+
+    /**
+     * Set the state of a panel for a specific window
+     * @param windowId The ID of the window
+     * @param panelId The ID of the panel (e.g., 'devTools', 'settings')
+     * @param isOpen Whether the panel should be open or closed
+     */
+    public async setPanelState(windowId: string, panelId: string, isOpen: boolean): Promise<void> {
+        const config = this.windowConfigs.get(windowId);
+        if (!config) {
+            throw new Error(`Window ${windowId} not found`);
+        }
+
+        // Initialize panels object if it doesn't exist
+        if (!config.panels) {
+            config.panels = {
+                devTools: false,
+                settings: false,
+                inspector: false
+            };
+        }
+
+        // Update panel state
+        config.panels[panelId] = isOpen;
+
+        // Update in-memory and persistent storage
+        this.windowConfigs.set(windowId, config);
+        await this.storageManager.saveWindowConfig(config);
+
+        // Notify the renderer process of the state change
+        const window = this.windows.get(windowId);
+        if (window) {
+            sendFromMain(window, 'panelStateChanged', {
+                panelId,
+                isOpen
+            });
+        }
+    }
+
+    /**
+     * Get all panel states for a specific window
+     * @param windowId The ID of the window
+     * @returns Object containing panel states
+     */
+    public async getPanelStates(windowId: string): Promise<Record<string, boolean>> {
+        const config = this.windowConfigs.get(windowId);
+        if (!config) {
+            throw new Error(`Window ${windowId} not found`);
+        }
+
+        return config.panels || {};
+    }
+
+    /**
+     * Get the configuration ID for a window instance
+     * @param window BrowserWindow instance
+     * @returns The configuration ID (e.g., 'main', 'settings') or undefined if not found
+     */
+    public getWindowConfigId(window: BrowserWindow): string | undefined {
+        for (const [id, win] of this.windows.entries()) {
+            if (win === window) {
+                return id;
+            }
+        }
+        return undefined;
+    }
 }

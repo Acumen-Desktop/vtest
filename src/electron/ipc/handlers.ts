@@ -1,6 +1,9 @@
 import { ipcMain, BrowserWindow } from 'electron';
 import { WindowManager } from '../utils/windowManager';
 
+// Track whether handlers have been set up
+let handlersInitialized = false;
+
 export function sendFromMain(window: BrowserWindow, channel: string, payload?: any) {
     if (!window || window.isDestroyed()) {
         console.warn('Attempted to send to an invalid or destroyed window');
@@ -13,6 +16,14 @@ export async function setupIPC_ReceiverHandlers(window: BrowserWindow) {
     if (!window || window.isDestroyed()) {
         throw new Error('Cannot setup IPC handlers with an invalid window reference');
     }
+
+    // Prevent duplicate handler registration
+    if (handlersInitialized) {
+        console.log('IPC handlers already initialized, skipping setup');
+        return;
+    }
+
+    handlersInitialized = true;
 
     // Handle messages from renderer process    
     ipcMain.on('toMain', async (event, data) => {
@@ -55,8 +66,68 @@ export async function setupIPC_ReceiverHandlers(window: BrowserWindow) {
         }
     });
 
+    // Register panel state handlers
+    ipcMain.handle('getPanelStates', async (event) => {
+        try {
+            const senderWindow = BrowserWindow.fromWebContents(event.sender);
+            if (!senderWindow) {
+                throw new Error('Could not determine sender window');
+            }
+
+            // Get the window config ID (e.g., 'main', 'settings') instead of numeric ID
+            const windowManager = WindowManager.getInstance();
+            const configId = windowManager.getWindowConfigId(senderWindow);
+            if (!configId) {
+                throw new Error('Could not find window configuration');
+            }
+
+            const panelStates = await windowManager.getPanelStates(configId);
+            return {
+                success: true,
+                panelStates
+            };
+        } catch (error) {
+            console.error('Error getting panel states:', error);
+            return {
+                success: false,
+                error: error
+            };
+        }
+    });
+
+    ipcMain.handle('setPanelState', async (event, data) => {
+        try {
+            const { panelId, isOpen } = data;
+            const senderWindow = BrowserWindow.fromWebContents(event.sender);
+            if (!senderWindow) {
+                throw new Error('Could not determine sender window');
+            }
+
+            // Get the window config ID (e.g., 'main', 'settings') instead of numeric ID
+            const windowManager = WindowManager.getInstance();
+            const configId = windowManager.getWindowConfigId(senderWindow);
+            if (!configId) {
+                throw new Error('Could not find window configuration');
+            }
+
+            await windowManager.setPanelState(configId, panelId, isOpen);
+            return {
+                success: true,
+                panelId,
+                isOpen
+            };
+        } catch (error) {
+            console.error('Error setting panel state:', error);
+            return {
+                success: false,
+                error: error
+            };
+        }
+    });
+
     // Handle window toggling
     ipcMain.handle('toggleWindow', async (_event, data) => {
+        console.log("Line 130 - handlers.ts - data: ", data);
         try {
             if (data.windowId) {
                 const windowManager = WindowManager.getInstance();
@@ -91,17 +162,20 @@ export async function setupIPC_ReceiverHandlers(window: BrowserWindow) {
     });
 
     // Handle DevTools toggle
-    ipcMain.handle('toggleDevTools', async (_event) => {
+    ipcMain.handle('toggleDevTools', async (event) => {
         try {
-            const webContents = window.webContents;
+            const webContents = event.sender;
+            let isOpen;
             if (webContents.isDevToolsOpened()) {
                 webContents.closeDevTools();
+                isOpen = false;
             } else {
                 webContents.openDevTools();
+                isOpen = true;
             }
             return {
                 success: true,
-                isDevToolsOpen: webContents.isDevToolsOpened()
+                isDevToolsOpen: isOpen
             };
         } catch (error) {
             console.error('Error in toggleDevTools:', error);
