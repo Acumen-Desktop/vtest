@@ -20,40 +20,36 @@
     <!-- {@render children()} -->
     <Resizable.PaneGroup id="mainLayout" direction="vertical">
         <Resizable.Pane id="top" defaultSize={65}>
-            <Resizable.PaneGroup direction="horizontal">
-                <Resizable.Pane defaultSize={50}>
+            <Resizable.PaneGroup id="topPaneGroup" direction="horizontal">
+                <Resizable.Pane id="topLeft" defaultSize={50}>
                     <div class="flex h-[200px] items-center justify-center p-6">
                         <span class="font-semibold">One</span>
                     </div>
                 </Resizable.Pane>
-                <Resizable.Handle withHandle />
-                <Resizable.Pane defaultSize={60}>
-                    <Resizable.Pane defaultSize={50}>
-                        <div
-                            class="flex h-[200px] items-center justify-center p-6"
-                        >
-                            <span class="font-semibold">Two</span>
-                        </div>
-                    </Resizable.Pane>
+                <Resizable.Handle id="topLeftRightHandle" withHandle />
+                <Resizable.Pane id="topRight" defaultSize={50}>
+                    <div class="flex h-[200px] items-center justify-center p-6">
+                        <span class="font-semibold">Two</span>
+                    </div>
                 </Resizable.Pane>
             </Resizable.PaneGroup>
         </Resizable.Pane>
-        <Resizable.Handle withHandle />
+        <Resizable.Handle id="topBottomHandle" withHandle />
         <Resizable.Pane id="bottom" defaultSize={30}>
-            <Resizable.PaneGroup direction="horizontal">
-                <Resizable.Pane defaultSize={30}>
+            <Resizable.PaneGroup id="bottomPaneGroup" direction="horizontal">
+                <Resizable.Pane id="bottomLeft" defaultSize={30}>
                     <div class="flex h-full items-center justify-center p-6">
                         <span class="font-semibold">Three</span>
                     </div>
                 </Resizable.Pane>
-                <Resizable.Handle withHandle />
-                <Resizable.Pane defaultSize={40}>
+                <Resizable.Handle id="bottomLeftCenterHandle" withHandle />
+                <Resizable.Pane id="bottomCenter" defaultSize={40}>
                     <div class="flex h-full items-center justify-center p-6">
                         <span class="font-semibold">Four</span>
                     </div>
                 </Resizable.Pane>
-                <Resizable.Handle withHandle />
-                <Resizable.Pane defaultSize={30}>
+                <Resizable.Handle id="bottomRightHandle" withHandle />
+                <Resizable.Pane id="bottomRight" defaultSize={30}>
                     <div class="flex h-full items-center justify-center p-6">
                         <span class="font-semibold">Five</span>
                     </div>
@@ -63,7 +59,7 @@
         <Resizable.Handle />
         <Resizable.Pane id="footer" defaultSize={5}>
             <div class="flex h-full items-center justify-center p-6">
-                <span class="font-semibold">Footer</span>
+                <span class="font-semibold">Six</span>
             </div>
         </Resizable.Pane>
     </Resizable.PaneGroup>
