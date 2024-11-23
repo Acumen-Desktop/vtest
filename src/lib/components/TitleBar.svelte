@@ -93,20 +93,8 @@
     .window-grip-section {
         -webkit-app-region: drag;
         padding-right: 8px;
-        /* display: flex;
-        align-items: center;
-        pointer-events: auto; */
     }
-    /*
-    .window-grip-section :global(svg) {
-        pointer-events: none;
-    }
-    .window-grip-section:hover {
-        cursor: grab;
-    }
-    .window-grip-section:active {
-        cursor: grabbing;
-    } */
+
     .left-section,
     .right-section {
         display: flex;

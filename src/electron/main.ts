@@ -6,7 +6,7 @@ import { initDisplayData } from './utils/displayData';
 import { sendFromMain, setupIPC_ReceiverHandlers } from './ipc/handlers';
 import { getAppPath } from './utils/pathData';
 import { get } from 'svelte/store';
-import { WindowManager } from './utils/windowManager';
+import { WindowManager, type WindowConfig } from './utils/windowManager';
 import { StorageManager } from './utils/storageManager';
 import { createMenu } from './menu';
 import { initializeConfig, updatePanelState } from './utils/initConfig';
@@ -19,6 +19,7 @@ enum OSType {
 }
 
 const CURRENT_OS = process.platform as OSType;
+process.noDeprecation = true;
 const scheme = 'app';
 const srcFolder = path.join(app.getAppPath(), `.vite/renderer/main_window/`);
 const staticAssetsFolder = import.meta.env.DEV ? path.join(import.meta.dirname, '../../static/') : srcFolder;
@@ -32,16 +33,14 @@ const windowOptionsCommon = {
 	minHeight: 200,
 	backgroundColor: '#374151',
 	autoHideMenuBar: true,
-	titleBarStyle: 'hiddenInset',
-	// 'default', 'hiddenInset', 'hidden', 'customButtonsOnHover',
-	// all but default create an error: 'textured' window type deprecated
+	show: false,
+	titleBarStyle: 'hiddenInset' as const,
 	titleBarOverlay: {
 		color: '#374151',
 		symbolColor: '#ffffff',
 		height: 35
 	},
 	webPreferences: {
-		show: false,
 		sandbox: true,
 		contextIsolation: true,
 		nodeIntegration: false,
@@ -75,8 +74,12 @@ async function createMainWindow() {
 	const mainWindow = windowManager.createWindow({
 		id: 'main',
 		options: windowOptionsCommon,
-		userOptions: {}  // Placeholder for user-defined options
-	});
+		userOptions: {}
+	} satisfies WindowConfig);
+
+	// Disable autofill
+	mainWindow.webContents.session.setSpellCheckerEnabled(false);
+	mainWindow.webContents.session.setPreloads([]);
 
 	// Restore window state or position on rightmost display
 	windowManager.restoreWindowState('main');
@@ -111,17 +114,12 @@ export async function createSettingsWindow() {
 		...windowOptionsCommon,
 		width: 800,
 		height: 600,
-		show: false,
-		webPreferences: {
-			nodeIntegration: false,
-			preload: path.join(import.meta.dirname, '../preload/preload.js'),
-		},
-	}
+	};
 	// console.log('Creating settings window with options:', settingsOptions);
 	const settingsWindow = windowManager.createWindow({
 		id: 'settings',
-		options: { ...settingsOptions }
-	});
+		options: settingsOptions
+	} satisfies WindowConfig);
 	try {
 		if (displayData) {
 			// console.log("Line 123 - main.ts - displayData: ", displayData);
