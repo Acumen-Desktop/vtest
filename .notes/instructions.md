@@ -98,6 +98,9 @@ Once copied, use the Icon component to display the icon:
 <Icon name="bug" />
 ```
 
+## Documentation
+- [Pane Components Documentation](.notes/paneForge.md) - Reference for Svelte Pane components (PaneGroup, Pane, PaneResizer)
+
 ## Development Workflow
 
 ### Running the Application
