@@ -2,8 +2,27 @@
     import "../app.css";
     import TitleBar from "$lib/components/TitleBar.svelte";
     import * as Resizable from "$lib/components/ui/resizable/index.js";
+    import { handleLayoutChange } from "$lib/utils/paneLayoutManager";
 
     let { children } = $props();
+
+    // Create a custom storage interface that uses localStorage
+    const paneStorage = {
+        getItem: (key: string) => {
+            const item = localStorage.getItem(key);
+            return item ? JSON.parse(item) : null;
+        },
+        setItem: (key: string, value: any) => {
+            localStorage.setItem(key, JSON.stringify(value));
+        },
+    };
+
+    // Handle layout changes by passing to our pane layout manager
+    function onLayoutChange(layoutId: string, handle?: string) {
+        return (layout: number[]) => {
+            handleLayoutChange(layoutId, layout, handle);
+        };
+    }
 
     $effect(() => {
         // if (preferredTheme.theme === "dark")
@@ -18,9 +37,29 @@
 >
     <TitleBar />
     <!-- {@render children()} -->
-    <Resizable.PaneGroup id="mainPaneGroup" direction="vertical">
+    <Resizable.PaneGroup
+        id="mainPaneGroup"
+        direction="vertical"
+        autoSaveId="top-bottom-footer-layout"
+        storage={paneStorage}
+        class="paneContainer"
+        onLayoutChange={onLayoutChange(
+            "top-bottom-footer-layout",
+            "topBottomHandle",
+        )}
+    >
         <Resizable.Pane id="top" defaultSize={65}>
-            <Resizable.PaneGroup id="topPaneGroup" direction="horizontal">
+            <Resizable.PaneGroup
+                id="topPaneGroup"
+                direction="horizontal"
+                autoSaveId="topLeft-topRight-layout"
+                storage={paneStorage}
+                class="paneContainer"
+                onLayoutChange={onLayoutChange(
+                    "topLeft-topRight-layout",
+                    "topLeftRightHandle",
+                )}
+            >
                 <Resizable.Pane
                     id="topLeft"
                     class="contentPane"
@@ -30,9 +69,21 @@
                         {@render children()}
                     </div>
                 </Resizable.Pane>
-                <Resizable.Handle id="topLeftRightHandle" withHandle />
+                <!-- <Resizable.Handle id="topLeftRightHandle" withHandle onDraggingChange={updatePaneLayout("topLeft", "topRight")} /> -->
+
+                <!-- onDraggingChange?: (isDragging: boolean) => void; -->
+
+                <Resizable.Handle
+                    id="topLeftRightHandle"
+                    withHandle
+                    onDraggingChange={(isDragging) =>
+                        console.log(
+                            "Line 74 - +layout.svelte - onDraggingChange",
+                            isDragging,
+                        )}
+                />
                 <Resizable.Pane id="topRight" defaultSize={50}>
-                    <div class="flex h-[200px] items-center justify-center p-6">
+                    <div class="flex h-full items-center justify-center p-6">
                         <span class="font-semibold">Two</span>
                     </div>
                 </Resizable.Pane>
@@ -40,7 +91,21 @@
         </Resizable.Pane>
         <Resizable.Handle id="topBottomHandle" withHandle />
         <Resizable.Pane id="bottom" defaultSize={30}>
-            <Resizable.PaneGroup id="bottomPaneGroup" direction="horizontal">
+            <Resizable.PaneGroup
+                id="bottomPaneGroup"
+                direction="horizontal"
+                autoSaveId="bottomLeft-bottomCenter-bottomRight-layout"
+                storage={paneStorage}
+                class="paneContainer"
+                onLayoutChange={(percentages) => {
+                    // Get the currently active handle from the event target
+                    const activeHandle = document.activeElement?.id;
+                    onLayoutChange(
+                        "bottomLeft-bottomCenter-bottomRight-layout",
+                        activeHandle,
+                    )(percentages);
+                }}
+            >
                 <Resizable.Pane id="bottomLeft" defaultSize={30}>
                     <div class="flex h-full items-center justify-center p-6">
                         <span class="font-semibold">Three</span>
@@ -52,7 +117,7 @@
                         <span class="font-semibold">Four</span>
                     </div>
                 </Resizable.Pane>
-                <Resizable.Handle id="bottomRightHandle" withHandle />
+                <Resizable.Handle id="bottomCenterRightHandle" withHandle />
                 <Resizable.Pane id="bottomRight" defaultSize={30}>
                     <div class="flex h-full items-center justify-center p-6">
                         <span class="font-semibold">Five</span>
@@ -60,7 +125,7 @@
                 </Resizable.Pane>
             </Resizable.PaneGroup>
         </Resizable.Pane>
-        <Resizable.Handle />
+        <Resizable.Handle id="bottomFooterHandle" withHandle />
         <Resizable.Pane id="footer" defaultSize={5}>
             <div class="flex h-full items-center justify-center p-6">
                 <span class="font-semibold">Six</span>

@@ -4,6 +4,22 @@ A container for panes or nested pane groups.
 
 The `PaneGroup` component wraps a collection of panes or nested `PaneGroup`s and is used to initialize and manage the layout of the panes.
 
+## Table of Contents
+
+- [PaneGroup](#panegroup)
+  - [Props](#props)
+  - [Imperative API](#imperative-api)
+  - [Persisted Layouts/Storage](#persisted-layoutsstorage)
+  - [Data Attributes](#data-attributes)
+- [Components](#components)
+  - [Pane](#pane)
+    - [Props](#pane-props)
+    - [Imperative API](#pane-imperative-api)
+    - [Data Attributes](#pane-data-attributes)
+  - [PaneResizer](#paneresizer)
+    - [Usage](#usage)
+    - [Props](#paneresizer-props)
+
 ## Props
 
 Here are the props available for the `PaneGroup` component:
@@ -105,14 +121,16 @@ export type PaneGroupAttributes = {
     /** The ID of the pane group. */
     "data-pane-group-id": string;
 };
-```
-## Components: Pane
+
+## Components
+
+### Pane
 
 An individual pane within a pane group.
 
 The `Pane` component is used to create an individual pane within a `PaneGroup`.
 
-## Props
+#### Props {#pane-props}
 
 Here are the props available for the `Pane` component:
 
@@ -133,7 +151,7 @@ export type PaneProps = {
 } & Omit<HTMLAttributes<HTMLDivElement>, "id">;
 ```
 
-## Imperative API
+#### Imperative API {#pane-imperative-api}
 
 The `Pane` component provides an imperative API for controlling the pane which can be accessed by binding a variable to the `api` prop. Here are the methods available on the `PaneAPI`:
 
@@ -149,7 +167,7 @@ export type PaneAPI = {
 };
 ```
 
-## Data Attributes
+#### Data Attributes {#pane-data-attributes}
 
 The following data attributes are available for the `Pane` component:
 
@@ -161,16 +179,13 @@ export type PaneAttributes = {
 };
 ```
 
-```markdown
-## Components
-
-# PaneResizer
+### PaneResizer
 
 A draggable handle between two panes that allows the user to resize them.
 
 The `PaneResizer` component is used to create a draggable handle between two panes that allows the user to resize them.
 
-## Usage
+#### Usage {#usage}
 
 ```svelte
 <script lang="ts">
@@ -184,7 +199,7 @@ The `PaneResizer` component is used to create a draggable handle between two pan
 </PaneGroup>
 ```
 
-## Props
+#### Props {#paneresizer-props}
 
 Here are the props available for the `PaneResizer` component:
 
@@ -209,7 +224,7 @@ export type PaneResizerProps = {
 } & HTMLAttributes<HTMLDivElement>;
 ```
 
-## Data Attributes
+#### Data Attributes
 
 The following data attributes are available for the `PaneResizer` component:
 
@@ -233,4 +248,3 @@ export type PaneResizerAttributes = {
   /** Present on all resizer elements */
   "data-pane-resizer": "";
 };
-```

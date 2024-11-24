@@ -5,6 +5,17 @@ import { contextBridge, ipcRenderer } from 'electron';
 contextBridge.exposeInMainWorld(
     'api', {
     platform: process.platform,
+    send: (channel: string, data?: any) => {
+        // whitelist channels
+        const validChannels = [
+            'layout:change'
+        ];
+        if (validChannels.includes(channel)) {
+            // TODO: This is crazy fast, may need to throttle
+            console.log("Line 14 - preload.ts - data: ", data);
+            ipcRenderer.send(channel, data);
+        }
+    },
     invoke: (channel: string, data?: any) => {
         // whitelist channels
         const validChannels = [
@@ -12,7 +23,8 @@ contextBridge.exposeInMainWorld(
             'toggleDevTools',
             'getWindowVisibility',
             'setPanelState',
-            'getPanelStates'
+            'getPanelStates',
+            'layout:change'
         ];
         if (validChannels.includes(channel)) {
             return ipcRenderer.invoke(channel, data);
@@ -22,7 +34,8 @@ contextBridge.exposeInMainWorld(
     on: (channel: string, callback: Function) => {
         const validChannels = [
             'windowVisibility',
-            'panelStateChanged'
+            'panelStateChanged',
+            'layout:change'
         ];
         if (validChannels.includes(channel)) {
             ipcRenderer.on(channel, (_event, data) => callback(data));
@@ -32,7 +45,8 @@ contextBridge.exposeInMainWorld(
     removeListener: (channel: string, callback: Function) => {
         const validChannels = [
             'windowVisibility',
-            'panelStateChanged'
+            'panelStateChanged',
+            'layout:change'
         ];
         if (validChannels.includes(channel)) {
             ipcRenderer.removeListener(channel, callback as any);

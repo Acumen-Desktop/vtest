@@ -14,6 +14,11 @@ export interface StoredWindowConfig {
         inspector: boolean;
         [key: string]: boolean;  // Allow for future panel additions
     };
+    panes?: {
+        [paneId: string]: {
+            bounds: Electron.Rectangle;
+        };
+    };
 }
 
 export interface StoredDisplayConfig {
@@ -54,7 +59,7 @@ export class StorageManager {
         return {
             windows: [],
             displays: [],
-            lastUpdate: new Date().toISOString()
+            lastUpdate: new Date().toISOString(),
         };
     }
 
@@ -106,5 +111,34 @@ export class StorageManager {
     public getAllDisplays(): StoredDisplayConfig[] {
         const data = this.loadData();
         return data.displays;
+    }
+
+    public savePaneLayout(windowId: string, paneId: string, bounds: Electron.Rectangle) {
+        const data = this.loadData();
+        const windowConfig = data.windows.find(w => w.id === windowId);
+        
+        if (!windowConfig) {
+            console.error(`Window ${windowId} not found`);
+            return;
+        }
+
+        if (!windowConfig.panes) {
+            windowConfig.panes = {};
+        }
+
+        windowConfig.panes[paneId] = { bounds };
+        this.saveData(data);
+    }
+
+    public getPaneLayout(windowId: string, paneId: string) {
+        const data = this.loadData();
+        const windowConfig = data.windows.find(w => w.id === windowId);
+        return windowConfig?.panes?.[paneId];
+    }
+
+    public getWindowPaneLayouts(windowId: string) {
+        const data = this.loadData();
+        const windowConfig = data.windows.find(w => w.id === windowId);
+        return windowConfig?.panes || {};
     }
 }

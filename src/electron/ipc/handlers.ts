@@ -1,5 +1,6 @@
 import { ipcMain, BrowserWindow } from 'electron';
 import { WindowManager } from '../utils/windowManager';
+import { setupPaneLayoutHandlers } from './paneLayoutHandler';
 
 // Track whether handlers have been set up
 let handlersInitialized = false;
@@ -24,6 +25,9 @@ export async function setupIPC_ReceiverHandlers(window: BrowserWindow) {
     }
 
     handlersInitialized = true;
+
+    // Set up pane layout handlers
+    setupPaneLayoutHandlers();
 
     // Handle messages from renderer process    
     ipcMain.on('toMain', async (event, data) => {
