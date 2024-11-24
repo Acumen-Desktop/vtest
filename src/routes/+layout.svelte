@@ -18,12 +18,16 @@
 >
     <TitleBar />
     <!-- {@render children()} -->
-    <Resizable.PaneGroup id="mainLayout" direction="vertical">
+    <Resizable.PaneGroup id="mainPaneGroup" direction="vertical">
         <Resizable.Pane id="top" defaultSize={65}>
             <Resizable.PaneGroup id="topPaneGroup" direction="horizontal">
-                <Resizable.Pane id="topLeft" defaultSize={50}>
-                    <div class="flex h-[200px] items-center justify-center p-6">
-                        <span class="font-semibold">One</span>
+                <Resizable.Pane
+                    id="topLeft"
+                    class="contentPane"
+                    defaultSize={50}
+                >
+                    <div class="paneContent">
+                        {@render children()}
                     </div>
                 </Resizable.Pane>
                 <Resizable.Handle id="topLeftRightHandle" withHandle />
@@ -72,5 +76,25 @@
         left: 1px;
         right: 1px;
         bottom: 1px;
+    }
+    :global(.contentPane) {
+        background-color: #4d4b4b;
+        border-radius: 2px;
+        height: calc(100% - 4px);
+        min-height: 0;
+        position: relative;
+        margin: 2px;
+    }
+    :global(.paneContent) {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        overflow: auto;
+    }
+    :global(.contentPane > *) {
+        height: 100%;
+        min-height: min-content;
     }
 </style>
