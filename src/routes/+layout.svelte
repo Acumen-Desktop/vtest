@@ -23,12 +23,6 @@
             handleLayoutChange(layoutId, layout, handle);
         };
     }
-
-    $effect(() => {
-        // if (preferredTheme.theme === "dark")
-        // 	window.setTitleBarColors("#374151", "#f8fafc");
-        // else window.setTitleBarColors("#e5e7eb", "#020617");
-    });
 </script>
 
 <div
@@ -65,26 +59,18 @@
                     class="contentPane"
                     defaultSize={50}
                 >
-                    <div class="paneContent">
+                    <div id="topLeftContent" class="paneContent">
                         {@render children()}
                     </div>
                 </Resizable.Pane>
-                <!-- <Resizable.Handle id="topLeftRightHandle" withHandle onDraggingChange={updatePaneLayout("topLeft", "topRight")} /> -->
-
-                <!-- onDraggingChange?: (isDragging: boolean) => void; -->
-
-                <Resizable.Handle
-                    id="topLeftRightHandle"
-                    withHandle
-                    onDraggingChange={(isDragging) =>
-                        console.log(
-                            "Line 74 - +layout.svelte - onDraggingChange",
-                            isDragging,
-                        )}
-                />
-                <Resizable.Pane id="topRight" defaultSize={50}>
-                    <div class="flex h-full items-center justify-center p-6">
-                        <span class="font-semibold">Two</span>
+                <Resizable.Handle id="topLeftRightHandle" withHandle />
+                <Resizable.Pane
+                    id="topRight"
+                    class="contentPane"
+                    defaultSize={50}
+                >
+                    <div id="topRightContent" class="paneContent">
+                        {@render children()}
                     </div>
                 </Resizable.Pane>
             </Resizable.PaneGroup>
@@ -106,29 +92,41 @@
                     )(percentages);
                 }}
             >
-                <Resizable.Pane id="bottomLeft" defaultSize={30}>
-                    <div class="flex h-full items-center justify-center p-6">
-                        <span class="font-semibold">Three</span>
+                <Resizable.Pane
+                    id="bottomLeft"
+                    class="contentPane"
+                    defaultSize={30}
+                >
+                    <div id="bottomLeftContent" class="paneContent">
+                        {@render children()}
                     </div>
                 </Resizable.Pane>
                 <Resizable.Handle id="bottomLeftCenterHandle" withHandle />
-                <Resizable.Pane id="bottomCenter" defaultSize={40}>
-                    <div class="flex h-full items-center justify-center p-6">
-                        <span class="font-semibold">Four</span>
+                <Resizable.Pane
+                    id="bottomCenter"
+                    class="contentPane"
+                    defaultSize={40}
+                >
+                    <div id="bottomCenterContent" class="paneContent">
+                        {@render children()}
                     </div>
                 </Resizable.Pane>
                 <Resizable.Handle id="bottomCenterRightHandle" withHandle />
-                <Resizable.Pane id="bottomRight" defaultSize={30}>
-                    <div class="flex h-full items-center justify-center p-6">
-                        <span class="font-semibold">Five</span>
+                <Resizable.Pane
+                    id="bottomRight"
+                    class="contentPane"
+                    defaultSize={30}
+                >
+                    <div id="bottomRightContent" class="paneContent">
+                        {@render children()}
                     </div>
                 </Resizable.Pane>
             </Resizable.PaneGroup>
         </Resizable.Pane>
         <Resizable.Handle id="bottomFooterHandle" withHandle />
-        <Resizable.Pane id="footer" defaultSize={5}>
-            <div class="flex h-full items-center justify-center p-6">
-                <span class="font-semibold">Six</span>
+        <Resizable.Pane id="footer" class="contentPane" defaultSize={5}>
+            <div id="footerContent" class="paneContent">
+                {@render children()}
             </div>
         </Resizable.Pane>
     </Resizable.PaneGroup>
