@@ -50,42 +50,32 @@ function createPaneStore() {
 
     // Get content from a specific pane
     getContent: (paneId: PaneId): PaneContent | null => {
-      return get(paneStore)[paneId];
+      return get({ subscribe })[paneId];
     },
 
-    // Check if a pane has content
-    hasContent: (paneId: PaneId): boolean => {
-      return get(paneStore)[paneId] !== null;
+    // Reset store to initial state
+    reset: () => {
+      set(initialState);
     },
 
-    // Reset all panes to initial state
-    reset: () => set(initialState),
-
-    // Load state from localStorage
-    loadState: () => {
-      try {
-        const savedState = localStorage.getItem(STORAGE_KEY);
-        if (savedState) {
-          const parsed = JSON.parse(savedState);
-          // Validate the structure before setting
-          if (Object.keys(parsed).every(isPaneId)) {
-            set(parsed);
-          }
+    // Load state from storage
+    loadFromStorage: () => {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        try {
+          const state = JSON.parse(stored);
+          set(state);
+        } catch (e) {
+          console.error('Failed to load pane state from storage:', e);
         }
-      } catch (error) {
-        console.error("Failed to load pane state:", error);
       }
     },
 
-    // Save state to localStorage
-    saveState: () => {
-      try {
-        const state = get(paneStore);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-      } catch (error) {
-        console.error("Failed to save pane state:", error);
-      }
-    },
+    // Save state to storage
+    saveToStorage: () => {
+      const state = get({ subscribe });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
   };
 }
 
