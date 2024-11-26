@@ -1,7 +1,7 @@
 import { app, Menu, BrowserWindow, type MenuItemConstructorOptions, MenuItem } from 'electron';
 
 export function createMenu(): void {
-    console.log("Line 4 - menu.ts - Creating application menu");
+    // console.log("Line 4 - menu.ts - Creating application menu");
 
     const isMac: boolean = process.platform === 'darwin';
     const template: MenuItemConstructorOptions[] = [
@@ -84,5 +84,5 @@ export function createMenu(): void {
     const menu = Menu.buildFromTemplate(template);
     Menu.setApplicationMenu(menu);
 
-    console.log("Line 89 - menu.ts - Application menu created successfully");
+    // console.log("Line 89 - menu.ts - Application menu created successfully");
 }

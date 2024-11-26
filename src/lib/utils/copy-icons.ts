@@ -7,7 +7,7 @@ const __dirname = dirname(__filename);
 
 // Get icon name from command line argument
 const iconName = process.argv[2];
-console.log(`Line 16 - copy-icons.ts - Copying icon: ${iconName}`);
+// console.log(`Line 16 - copy-icons.ts - Copying icon: ${iconName}`);
 
 if (!iconName) {
     console.error('Please provide an icon name as an argument');
@@ -29,7 +29,7 @@ const targetPath = join(targetDir, `${iconName}.svg`);
 try {
     if (existsSync(sourcePath)) {
         copyFileSync(sourcePath, targetPath);
-        console.log(`✓ Copied ${iconName}.svg`);
+        // console.log(`✓ Copied ${iconName}.svg`);
     } else {
         console.error(`✗ Icon not found: ${iconName}.svg`);
         process.exit(1);

@@ -45,7 +45,7 @@ export class StorageManager {
         // - Windows: %APPDATA%/[app name]
         // - Linux: ~/.config/[app name]
         this.storagePath = path.join(app.getPath('userData'), 'window-config.json');
-        console.log('Line 35 - storageManager.ts - Storage path:', this.storagePath);
+        // console.log('Line 35 - storageManager.ts - Storage path:', this.storagePath);
     }
 
     public static getInstance(): StorageManager {

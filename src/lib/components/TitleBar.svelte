@@ -15,10 +15,10 @@
         // Get platform info from the electron process
         isMac = window.api?.platform === "darwin";
         isLinux = window.api?.platform === "linux";
-        console.log(
-            "Line 15 - TitleBar.svelte - window.api.platform: ",
-            window.api.platform,
-        );
+        // console.log(
+        //     "Line 15 - TitleBar.svelte - window.api.platform: ",
+        //     window.api.platform,
+        // );
     });
 
     // Constants for spacing around native window controls

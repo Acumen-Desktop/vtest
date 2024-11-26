@@ -1,29 +1,92 @@
 // src/lib/stores/paneStore.ts
-import { writable } from 'svelte/store';
+import { writable, get } from "svelte/store";
+import type { PaneState, PaneId, PaneContent } from "$lib/types/pane";
+import { isPaneId } from "$lib/types/pane";
 
-export type PaneContentDimensions = {
-    width: number;
-    height: number;
+const STORAGE_KEY = "paneState";
+
+const initialState: PaneState = {
+  topLeft: null,
+  topRight: null,
+  bottomLeft: null,
+  bottomCenter: null,
+  bottomRight: null,
+  footer: null,
 };
 
-export type PaneContent = {
-    id: string;
-    element: HTMLElement | null;
-    dimensions: PaneContentDimensions;
-};
+function createPaneStore() {
+  const { subscribe, set, update } = writable<PaneState>(initialState);
 
-export type PaneStore = {
-    [key: string]: PaneContent;
-};
+  return {
+    subscribe,
 
-// Create initial store with our six panes
-const initialPanes: PaneStore = {
-    topLeft: { id: 'topLeftContent', element: null, dimensions: { width: 0, height: 0 } },
-    topRight: { id: 'topRightContent', element: null, dimensions: { width: 0, height: 0 } },
-    bottomLeft: { id: 'bottomLeftContent', element: null, dimensions: { width: 0, height: 0 } },
-    bottomCenter: { id: 'bottomCenterContent', element: null, dimensions: { width: 0, height: 0 } },
-    bottomRight: { id: 'bottomRightContent', element: null, dimensions: { width: 0, height: 0 } },
-    footer: { id: 'footerContent', element: null, dimensions: { width: 0, height: 0 } }
-};
+    // Add content to a pane
+    addContent: (paneId: PaneId, content: PaneContent) => {
+      update((state) => ({
+        ...state,
+        [paneId]: content,
+      }));
+    },
 
-export const paneStore = writable<PaneStore>(initialPanes);
+    // Remove content from a pane
+    removeContent: (paneId: PaneId) => {
+      update((state) => ({
+        ...state,
+        [paneId]: null,
+      }));
+    },
+
+    // Move content between panes
+    moveContent: (fromPaneId: PaneId, toPaneId: PaneId) => {
+      update((state) => {
+        const content = state[fromPaneId];
+        return {
+          ...state,
+          [fromPaneId]: null,
+          [toPaneId]: content,
+        };
+      });
+    },
+
+    // Get content from a specific pane
+    getContent: (paneId: PaneId): PaneContent | null => {
+      return get(paneStore)[paneId];
+    },
+
+    // Check if a pane has content
+    hasContent: (paneId: PaneId): boolean => {
+      return get(paneStore)[paneId] !== null;
+    },
+
+    // Reset all panes to initial state
+    reset: () => set(initialState),
+
+    // Load state from localStorage
+    loadState: () => {
+      try {
+        const savedState = localStorage.getItem(STORAGE_KEY);
+        if (savedState) {
+          const parsed = JSON.parse(savedState);
+          // Validate the structure before setting
+          if (Object.keys(parsed).every(isPaneId)) {
+            set(parsed);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to load pane state:", error);
+      }
+    },
+
+    // Save state to localStorage
+    saveState: () => {
+      try {
+        const state = get(paneStore);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (error) {
+        console.error("Failed to save pane state:", error);
+      }
+    },
+  };
+}
+
+export const paneStore = createPaneStore();

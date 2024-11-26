@@ -61,7 +61,7 @@ export class WindowManager {
      * Sets up event handlers for window state changes (move, resize, close)
      */
     public createWindow(config: WindowConfig): BrowserWindow {
-        console.log('Line 57 - windowManager.ts - Creating window with config:', config);
+        // console.log('Line 57 - windowManager.ts - Creating window with config:', config);
         const existingWindow = this.windows.get(config.id);
         if (existingWindow) {
             return existingWindow;
@@ -86,7 +86,7 @@ export class WindowManager {
         });
 
         this.windows.set(config.id, window);
-        
+
         // Only save user-defined options and bounds
         const configToSave: StoredWindowConfig = {
             id: config.id,
@@ -209,7 +209,7 @@ export class WindowManager {
         if (window && !window.isDestroyed()) {
             const bounds = window.getBounds();
             const isVisible = window.isVisible();
-            
+
             // Get the display containing the window
             const displayPoint = {
                 x: bounds.x + bounds.width / 2,
@@ -235,7 +235,7 @@ export class WindowManager {
      */
     private validateWindowBounds(bounds: Electron.Rectangle): Electron.Rectangle {
         const displays = screen.getAllDisplays();
-        
+
         // Find the display that contains the window
         const containingDisplay = screen.getDisplayNearestPoint({
             x: bounds.x + bounds.width / 2,
@@ -278,7 +278,7 @@ export class WindowManager {
                 ? current
                 : rightmost;
         }, displays[0]);
-        
+
         return rightmostDisplay.workArea;
     }
 
@@ -289,7 +289,7 @@ export class WindowManager {
     public restoreWindowState(id: string): void {
         const window = this.windows.get(id);
         const config = this.windowConfigs.get(id);
-        
+
         if (!window || window.isDestroyed()) return;
 
         if (config?.bounds) {

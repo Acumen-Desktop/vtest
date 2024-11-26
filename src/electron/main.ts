@@ -105,7 +105,7 @@ export async function createSettingsWindow() {
 	// Check if window already exists
 	const existingWindow = windowManager.getWindow('settings');
 	if (existingWindow) {
-		console.log('Settings window already exists, showing it');
+		// console.log('Settings window already exists, showing it');
 		windowManager.setWindowVisibility('settings', true);
 		return existingWindow;
 	}
@@ -151,10 +151,10 @@ export async function createSettingsWindow() {
 
 	// Add URL loading
 	if (import.meta.env.DEV) {
-		console.log('Line 148 - main.ts - Loading settings window URL in DEV mode');
+		// console.log('Line 148 - main.ts - Loading settings window URL in DEV mode');
 		settingsWindow.loadURL(`${VITE_DEV_SERVER_URLS['main_window']}/settings`);
 	} else {
-		console.log('Line 153 - main.ts - Loading settings window URL in PROD mode');
+		// console.log('Line 153 - main.ts - Loading settings window URL in PROD mode');
 		settingsWindow.loadURL('app://-/settings');
 	}
 	return settingsWindow;

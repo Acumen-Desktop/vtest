@@ -3,7 +3,7 @@
 	import { onMount } from "svelte";
 
 	onMount(() => {
-		console.log("Settings page mounted");
+		// console.log("Settings page mounted");
 		// TODO: send notification back to main process, then to renderer of success
 	});
 </script>

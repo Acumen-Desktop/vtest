@@ -1,172 +1,123 @@
 <script lang="ts">
-	import electronLogo from "$lib/assets/electron.svg";
-	import svelteLogo from "$lib/assets/svelteKit.svg";
-	import typescriptLogo from "$lib/assets/typescript.svg";
-	import viteLogo from "$lib/assets/vite.svg";
-	import tailwindcssLogo from "$lib/assets/tailwindcss.svg";
-	import Counter from "$lib/components/Counter.svelte";
-	import { onMount } from "svelte";
-	import { Button } from "$lib/components/ui/button/index.js";
-	import Mail from "lucide-svelte/icons/mail";
+  import { onMount } from "svelte";
+  import { paneStore } from "$lib/stores/paneStore";
+  import FileExplorer from "$lib/components/panes/FileExplorer.svelte";
+  import CodeEditor from "$lib/components/panes/CodeEditor.svelte";
+  import Terminal from "$lib/components/panes/Terminal.svelte";
+  import type { FileNode } from "$lib/types/fileExplorer";
+  import type { PaneId } from "$lib/types/pane";
 
-	let isSettingsVisible = false;
+  const sampleCode = `// Welcome to the Code Editor
+import { greet } from './utils';
 
-	onMount(() => {
-		// Listen for window visibility updates
-		window.api.on(
-			"windowVisibility",
-			(data: { windowId: string; isVisible: boolean }) => {
-				if (data.windowId === "settings") {
-					isSettingsVisible = data.isVisible;
-					console.log(
-						"Settings visibility updated:",
-						isSettingsVisible,
-					);
-				}
-			},
-		);
+function main() {
+    const message = greet('Developer');
+    // console.log(message);
+}
 
-		window.api.on("test-console-log", (message: any) => {
-			console.log(
-				"Line 26 - +page.svelte - Received test-console-log:",
-				message.displayData,
-			);
-		});
+main();
+`;
 
-		window.api.on("fromMain", (data: any) => {
-			if (data.action === "log-data") {
-				console.error(
-					"Line 31 - +page.svelte - Display Error:",
-					data.error,
-				);
-			}
-		});
-	});
+  const fileTree: FileNode = {
+    name: "src",
+    type: "directory",
+    expanded: true,
+    children: [
+      {
+        name: "lib",
+        type: "directory",
+        expanded: true,
+        children: [
+          { name: "components", type: "directory", children: [] },
+          { name: "stores", type: "directory", children: [] },
+          { name: "utils", type: "directory", children: [] },
+        ],
+      },
+      {
+        name: "routes",
+        type: "directory",
+        expanded: true,
+        children: [
+          { name: "+layout.svelte", type: "file" },
+          { name: "+page.svelte", type: "file" },
+        ],
+      },
+      { name: "app.css", type: "file" },
+    ],
+  };
 
-	async function toggleSettings() {
-		try {
-			const result = await window.api.invoke("toggleWindow", {
-				windowId: "settings",
-			});
+  onMount(() => {
+    // Reset existing content
+    paneStore.reset();
 
-			if (result.success) {
-				isSettingsVisible = result.isVisible;
-			} else {
-				console.error(
-					"Line 41 - +page.svelte - Failed to toggle settings window:",
-					result.error,
-				);
-			}
-		} catch (error) {
-			console.error("Line 46 - +page.svelte - toggling settings:", error);
-		}
-	}
+    // Define and add content for each pane
+    const panes: Record<
+      PaneId,
+      { id: string; component: any; title: string; props: any }
+    > = {
+      topLeft: {
+        id: "file-explorer",
+        component: FileExplorer,
+        title: "File Explorer",
+        props: { rootNode: fileTree },
+      },
+      topRight: {
+        id: "main-editor",
+        component: CodeEditor,
+        title: "Code Editor",
+        props: {
+          content: sampleCode,
+          language: "javascript",
+        },
+      },
+      bottomLeft: {
+        id: "main-terminal",
+        component: Terminal,
+        title: "Terminal",
+        props: {
+          initialText: "$ Welcome to the Terminal\n$ Ready for commands...\n",
+        },
+      },
+      bottomCenter: {
+        id: "secondary-editor",
+        component: CodeEditor,
+        title: "Secondary Editor",
+        props: {
+          content: "// Secondary Editor\n",
+          language: "javascript",
+        },
+      },
+      bottomRight: {
+        id: "output-terminal",
+        component: Terminal,
+        title: "Output",
+        props: {
+          initialText: "$ Output Terminal\n",
+        },
+      },
+      footer: {
+        id: "status-terminal",
+        component: Terminal,
+        title: "Status",
+        props: {
+          initialText: "$ Status and Logs\n",
+        },
+      },
+    };
+
+    // Add each pane's content
+    Object.entries(panes).forEach(([paneId, content]) => {
+      paneStore.addContent(paneId as PaneId, { ...content, closeable: true });
+    });
+  });
 </script>
 
-<div id="welcomePage" class="h-full">
-	<div class="max-w-7xl mx-auto px-16 py-20">
-		<div class="flex justify-center mb-8">
-			<Button onclick={toggleSettings}>
-				{isSettingsVisible ? "Hide" : "Show"} Settings
-			</Button>
-			<Button
-				onclick={() => console.log("Line 67 - +page.svelte - clicked: ")}
-			>
-				<Mail class="mr-2 size-4" />
-				Login with Email
-			</Button>
-		</div>
-		<div
-			class="flex gap-16 flex-wrap justify-center *:shrink-0 *:transition *:duration-500 [&>*:hover]:duration-100"
-		>
-			<a
-				id="vite"
-				href="https://vitejs.dev"
-				target="_blank"
-				rel="noreferrer"
-				class="hover:drop-shadow-[0_0_2em_#646cffaa]"
-			>
-				<img src={viteLogo} class="w-24 h-24" alt="Vite Logo" />
-			</a>
-			<a
-				id="typescript"
-				href="https://www.typescriptlang.org"
-				target="_blank"
-				rel="noreferrer"
-				class="hover:drop-shadow-[0_0_2em_#3178c6aa]"
-			>
-				<img src={typescriptLogo} class="w-24 h-24" alt="Typescript Logo" />
-			</a>
-			<a
-				id="electronForge"
-				href="https://www.electronforge.io/"
-				target="_blank"
-				rel="noreferrer"
-				class="hover:drop-shadow-[0_0_2em_#2f3242aa]"
-			>
-				<img
-					src={electronLogo}
-					class="w-24 h-24"
-					alt="Electron Forge Logo"
-				/>
-			</a>
-			<a
-				id="svelteKit"
-				href="https://kit.svelte.dev/"
-				target="_blank"
-				rel="noreferrer"
-				class="hover:drop-shadow-[0_0_2em_#ff3e00aa]"
-			>
-				<img src={svelteLogo} class="w-24 h-24" alt="Svelte Kit Logo" />
-			</a>
-			<a
-				id="tailwind"
-				href="https://tailwindcss.com/"
-				target="_blank"
-				rel="noreferrer"
-				class="hover:drop-shadow-[0_0_2em_#19b5baaa]"
-			>
-				<img
-					src={tailwindcssLogo}
-					class="w-24 h-24"
-					alt="Tailwind CSS Logo"
-				/>
-			</a>
-		</div>
-		<p class="mt-16 text-gray-600 dark:text-gray-400 text-center">
-			Click on the logos to learn more
-		</p>
-		<h1 class="text-center text-5xl leading-tight *:transition *:duration-500">
-			<span
-				class="[*:has(#vite:hover)~*>&]:duration-100 [*:has(#vite:hover)~*>&]:text-indigo-500"
-				>Vite</span
-			>
-			+
-			<span
-				class="[*:has(#typescript:hover)~*>&]:duration-100 [*:has(#typescript:hover)~*>&]:text-blue-500"
-				>Typescript</span
-			>
-			+
-			<span
-				class="[*:has(#electronForge:hover)~*>&]:duration-100 [*:has(#electronForge:hover)~*>&]:text-slate-500"
-				>Electron Forge</span
-			>
-			+
-			<span
-				class="[*:has(#svelteKit:hover)~*>&]:duration-100 [*:has(#svelteKit:hover)~*>&]:text-orange-500"
-				>SvelteKit</span
-			>
-			+
-			<span
-				class="[*:has(#tailwind:hover)~*>&]:duration-100 [*:has(#tailwind:hover)~*>&]:text-sky-500"
-				>Tailwind CSS</span
-			>
-		</h1>
-		<div class="m-auto w-fit mt-16">
-			<Counter />
-		</div>
-		<div class="m-auto w-fit mt-16">
-			<a href="/test">Test Page</a>
-		</div>
-	</div>
+<div class="page">
+  <!-- Page content will be rendered through the layout -->
 </div>
+
+<style>
+  .page {
+    height: 100%;
+  }
+</style>

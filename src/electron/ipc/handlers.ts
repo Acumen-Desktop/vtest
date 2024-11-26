@@ -20,7 +20,7 @@ export async function setupIPC_ReceiverHandlers(window: BrowserWindow) {
 
     // Prevent duplicate handler registration
     if (handlersInitialized) {
-        console.log('IPC handlers already initialized, skipping setup');
+        // console.log('IPC handlers already initialized, skipping setup');
         return;
     }
 
@@ -31,7 +31,7 @@ export async function setupIPC_ReceiverHandlers(window: BrowserWindow) {
 
     // Handle messages from renderer process    
     ipcMain.on('toMain', async (event, data) => {
-        console.log('Line 20 - handlers.ts - Received in main:', data);
+        // console.log('Line 20 - handlers.ts - Received in main:', data);
         // Get the window that sent the message
         const senderWindow = BrowserWindow.fromWebContents(event.sender);
         if (!senderWindow) {
@@ -41,7 +41,7 @@ export async function setupIPC_ReceiverHandlers(window: BrowserWindow) {
 
         switch (data?.action) {
             case 'saveFile':
-                console.log('Saving file:', data.content);
+                // console.log('Saving file:', data.content);
                 sendFromMain(senderWindow, 'saveFileResponse', {
                     success: true,
                     message: 'File saved successfully'
@@ -54,7 +54,7 @@ export async function setupIPC_ReceiverHandlers(window: BrowserWindow) {
                 break;
 
             case 'test-console-log':
-                console.log('Line 29 - handlers.ts - Test console log event received');
+                // console.log('Line 29 - handlers.ts - Test console log event received');
                 sendFromMain(senderWindow, 'fromMain', {
                     success: true,
                     message: 'Test console log event handled'
@@ -131,12 +131,12 @@ export async function setupIPC_ReceiverHandlers(window: BrowserWindow) {
 
     // Handle window toggling
     ipcMain.handle('toggleWindow', async (_event, data) => {
-        console.log("Line 130 - handlers.ts - data: ", data);
+        // console.log("Line 130 - handlers.ts - data: ", data);
         try {
             if (data.windowId) {
                 const windowManager = WindowManager.getInstance();
                 const windowsInfo = windowManager.getAllWindowsInfo();
-                console.log("Line 42 - handlers.ts - windowsInfo: ", windowsInfo);
+                // console.log("Line 42 - handlers.ts - windowsInfo: ", windowsInfo);
 
                 let targetWindow = windowManager.getWindow(data.windowId);
                 if (targetWindow) {

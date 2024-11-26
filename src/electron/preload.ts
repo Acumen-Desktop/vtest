@@ -12,7 +12,7 @@ contextBridge.exposeInMainWorld(
         ];
         if (validChannels.includes(channel)) {
             // TODO: This is crazy fast, may need to throttle
-            console.log("Line 14 - preload.ts - data: ", data);
+            // console.log("Line 14 - preload.ts - data: ", data);
             ipcRenderer.send(channel, data);
         }
     },

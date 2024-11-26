@@ -18,12 +18,12 @@ interface LayoutChangeMessage {
 }
 
 export function setupPaneLayoutHandlers() {
-    console.log('Setting up pane layout handlers...');
+    // console.log('Setting up pane layout handlers...');
     const storageManager = StorageManager.getInstance();
     const windowManager = WindowManager.getInstance();
 
     ipcMain.on('layout:change', (event, message: LayoutChangeMessage) => {
-        console.log('Received layout change:', message);
+        // console.log('Received layout change:', message);
         const { layoutId, affectedPanes } = message;
         
         const sourceWindow = BrowserWindow.fromWebContents(event.sender);
@@ -39,7 +39,7 @@ export function setupPaneLayoutHandlers() {
             return;
         }
 
-        console.log('Window ID:', windowId);
+        // console.log('Window ID:', windowId);
 
         // Save each affected pane's layout
         for (const pane of affectedPanes) {
@@ -53,7 +53,7 @@ export function setupPaneLayoutHandlers() {
                 };
                 
                 storageManager.savePaneLayout(windowId, pane.id, bounds);
-                console.log(`Saved layout for pane ${pane.id}:`, bounds);
+                // console.log(`Saved layout for pane ${pane.id}:`, bounds);
             } catch (error) {
                 console.error(`Error saving layout for pane ${pane.id}:`, error);
             }
@@ -61,8 +61,8 @@ export function setupPaneLayoutHandlers() {
 
         // Verify storage
         const savedLayouts = storageManager.getWindowPaneLayouts(windowId);
-        console.log('Retrieved layouts from storage:', savedLayouts);
+        // console.log('Retrieved layouts from storage:', savedLayouts);
     });
     
-    console.log('Pane layout handlers setup complete');
+    // console.log('Pane layout handlers setup complete');
 }
