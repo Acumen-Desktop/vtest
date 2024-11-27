@@ -4,8 +4,8 @@
   import { markdown, markdownLanguage } from "@codemirror/lang-markdown";
   import { languages } from "@codemirror/language-data";
   import { oneDark } from "@codemirror/theme-one-dark";
-  import { EditorView, basicSetup } from "codemirror";
   import type { Extension } from "@codemirror/state";
+  import { EditorView, basicSetup } from "codemirror";
   import { marked } from "marked";
   import DOMPurify from 'dompurify';
 
@@ -20,39 +20,101 @@ Type your **Markdown** here and see the *live preview* on the right!
 `;
 
   let value = $state(initialValue);
-  let editor: CodeMirror;
+  let editor: CodeMirror | null = null;
+  let editorView: EditorView | null = null;
 
-  const extensions: Extension[] = [
+  // Explicitly create extensions
+  const editorExtensions: Extension[] = [
     basicSetup,
     EditorView.lineWrapping,
     markdown({
       base: markdownLanguage,
       codeLanguages: languages
-    })
+    }),
+    oneDark
   ];
 
-  let renderedHtml = $state('');
+  let renderedHtml = $state(initialValue);
   let wordCount = $derived(value.trim().split(/\s+/).length);
   let characterCount = $derived(value.length);
 
   $effect(() => {
     async function parseMarkdown() {
-      const parsed = await marked.parse(value, { async: true });
-      renderedHtml = DOMPurify.sanitize(parsed);
+      try {
+        const parsed = await marked.parse(value, { async: true });
+        renderedHtml = DOMPurify.sanitize(parsed);
+      } catch (error) {
+        console.error('Markdown parsing error:', error);
+      }
     }
     parseMarkdown();
   });
 
-  onMount(() => {
-    // Ensure initial value is set
-    if (editor && !value) {
-      value = initialValue;
-    }
-  });
+  function applyFormat(type: 'bold' | 'italic' | 'list') {
+    if (!editorView) return;
 
-  function applyFormat(command: string) {
-    // Note: This is a placeholder. Actual implementation will depend on CodeMirror API
-    document.execCommand(command, false, undefined);
+    const { state, dispatch } = editorView;
+    const { from, to } = state.selection.main;
+
+    // If no text selected, insert at cursor
+    if (from === to) {
+      switch (type) {
+        case 'bold':
+          dispatch({
+            changes: { from, insert: '****' },
+            selection: { anchor: from + 2 }
+          });
+          break;
+        case 'italic':
+          dispatch({
+            changes: { from, insert: '**' },
+            selection: { anchor: from + 1 }
+          });
+          break;
+        case 'list':
+          dispatch({
+            changes: { from, insert: '- ' },
+            selection: { anchor: from + 2 }
+          });
+          break;
+      }
+    } else {
+      // Text is selected
+      const selectedText = state.sliceDoc(from, to);
+      switch (type) {
+        case 'bold':
+          dispatch({
+            changes: [
+              { from, to, insert: `**${selectedText}**` }
+            ],
+            selection: { anchor: from + selectedText.length + 4 }
+          });
+          break;
+        case 'italic':
+          dispatch({
+            changes: [
+              { from, to, insert: `*${selectedText}*` }
+            ],
+            selection: { anchor: from + selectedText.length + 2 }
+          });
+          break;
+        case 'list':
+          dispatch({
+            changes: [
+              { from, to, insert: `- ${selectedText}` }
+            ],
+            selection: { anchor: from + selectedText.length + 2 }
+          });
+          break;
+      }
+    }
+
+    // Focus back to the editor
+    editorView.focus();
+  }
+
+  function handleEditorMount(event: CustomEvent<EditorView>) {
+    editorView = event.detail;
   }
 </script>
 
@@ -60,7 +122,7 @@ Type your **Markdown** here and see the *live preview* on the right!
   <div class="editor-toolbar">
     <button onclick={() => applyFormat('bold')}>Bold</button>
     <button onclick={() => applyFormat('italic')}>Italic</button>
-    <button onclick={() => applyFormat('insertOrderedList')}>List</button>
+    <button onclick={() => applyFormat('list')}>List</button>
     <span class="stats">Words: {wordCount} | Chars: {characterCount}</span>
   </div>
   
@@ -69,10 +131,10 @@ Type your **Markdown** here and see the *live preview* on the right!
       <CodeMirror 
         bind:this={editor}
         bind:value 
-        extensions={extensions} 
-        theme={oneDark} 
+        extensions={editorExtensions} 
         placeholder="Start typing your Markdown here..."
         class="h-full"
+        on:mount={handleEditorMount}
       />
     </div>
     <div class="preview-panel bg-white dark:bg-gray-800">
