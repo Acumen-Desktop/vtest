@@ -63,6 +63,11 @@
 	},
 	"license": "MIT",
 	"dependencies": {
-		"electron-squirrel-startup": "^1.0.1"
+		"@codemirror/lang-markdown": "6.3.1",
+		"@codemirror/language-data": "6.5.1",
+		"@tailwindcss/typography": "0.5.15",
+		"dompurify": "3.2.1",
+		"electron-squirrel-startup": "^1.0.1",
+		"marked": "15.0.2"
 	}
 }

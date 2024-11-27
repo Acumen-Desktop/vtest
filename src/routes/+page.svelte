@@ -1,12 +1,12 @@
 <script lang="ts">
     // import type { PageData } from "./$types";
-    import CodeEditor from "$lib/components/panes/CodeEditor.svelte";
+    import MarkdownEditor from "$lib/components/panes/MarkdownEditor.svelte";
 
     // let { data }: { data: PageData } = $props();
 </script>
 
 <div id="mainPage" class="full bg-[hsl(var(--background))]">
-    <CodeEditor />
+    <MarkdownEditor />
 </div>
 
 <style>

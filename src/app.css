@@ -69,11 +69,11 @@
   }
 
   * {
-    @apply border-border;
+    @apply border-gray-900 dark:border-gray-50;
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-white dark:bg-gray-950 text-gray-900 dark:text-white;
   }
   .full {
         width: 100vw;

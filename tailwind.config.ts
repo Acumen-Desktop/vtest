@@ -1,6 +1,7 @@
 import { fontFamily } from "tailwindcss/defaultTheme";
 import type { Config } from "tailwindcss";
 import tailwindcssAnimate from "tailwindcss-animate";
+import tailwindTypography from "@tailwindcss/typography";
 
 const config: Config = {
 	darkMode: ["class"],
@@ -66,6 +67,14 @@ const config: Config = {
 				md: "calc(var(--radius) - 2px)",
 				sm: "calc(var(--radius) - 4px)"
 			},
+			typography: {
+				DEFAULT: {
+					css: {
+						// Customize prose styles here if needed
+						maxWidth: 'none',
+					}
+				}
+			},
 			fontFamily: {
 				sans: [...fontFamily.sans]
 			},
@@ -90,7 +99,7 @@ const config: Config = {
       		},
 		},
 	},
-	plugins: [tailwindcssAnimate],
+	plugins: [tailwindcssAnimate, tailwindTypography],
 };
 
 export default config;
