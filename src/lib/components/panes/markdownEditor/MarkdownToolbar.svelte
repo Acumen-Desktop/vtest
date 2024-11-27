@@ -240,7 +240,7 @@
                 {/key}
               </Button>
             </Tooltip.Trigger>
-            <Tooltip.Content>
+            <Tooltip.Content side="bottom" sideOffset={20}>
               <p>{action.tooltip}</p>
             </Tooltip.Content>
           </Tooltip.Root>
@@ -255,9 +255,10 @@
 
 <style lang="postcss">
   .editor-toolbar {
-    @apply flex items-center gap-2 p-2 bg-accent border-b border-border overflow-x-auto;
-    min-height: 3rem; /* Ensure consistent height even when scrolling */
-    @apply dark:bg-accent;
+    @apply flex items-center gap-2 p-2 overflow-x-auto;
+    min-height: 3rem;
+    background-color: hsl(var(--accent));
+    border-bottom: 1px solid hsl(var(--border));
   }
 
   .toolbar-group {
@@ -265,7 +266,12 @@
   }
 
   :global(.toolbar-btn) {
-    @apply hover:bg-gray-200 dark:hover:bg-gray-700;
+    color: hsl(var(--accent-foreground));
+  }
+
+  :global(.toolbar-btn:hover) {
+    background-color: hsl(var(--accent-foreground));
+    color: hsl(var(--accent));
   }
 
   /* Add padding to ensure last items are visible when scrolling */

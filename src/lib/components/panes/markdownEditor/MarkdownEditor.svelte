@@ -9,7 +9,7 @@
   import { oneDark } from "@codemirror/theme-one-dark";
   import { marked } from "marked";
   import DOMPurify from "dompurify";
-  import type { ComponentProps } from "svelte";
+  // import type { ComponentProps } from "svelte";
 
   const initialValue = `# Welcome to Markdown Editor
 
