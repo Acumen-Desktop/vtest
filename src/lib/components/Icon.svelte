@@ -2,7 +2,7 @@
     // import { onMount } from "svelte";
     // import { tick } from "svelte";
 
-    let { name, size = 22, class_name = "" } = $props();
+    let { name, size = 22, class: className = "" } = $props();
 
     let svg = $state("");
 
@@ -23,7 +23,7 @@
 </script>
 
 <div
-    class="inline-block {class_name}"
+    class="inline-block {className}"
     style="width: {size}px; height: {size}px;"
 >
     {@html svg}

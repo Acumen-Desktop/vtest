@@ -1,76 +1,93 @@
-<!-- Title bar component that overlays the native window controls -->
 <script lang="ts">
     import { Button } from "$lib/components/ui/button";
-    import { Separator } from "$lib/components/ui/separator";
     import { onMount } from "svelte";
     import Devtools from "./Devtools.svelte";
     import Icon from "$lib/components/Icon.svelte";
-    import Grip from "lucide-svelte/icons/grip";
+    import { Moon, Sun } from "lucide-svelte";
 
-    // OS detection
-    let isMac = false;
-    let isLinux = false;
+    let paddingStyle = "";
+    let isDarkMode = true;
 
     onMount(() => {
-        // Get platform info from the electron process
-        isMac = window.api?.platform === "darwin";
-        isLinux = window.api?.platform === "linux";
-        // console.log(
-        //     "Line 15 - TitleBar.svelte - window.api.platform: ",
-        //     window.api.platform,
-        // );
+        const MACOS_CONTROL_WIDTH = 80;
+        const WINDOWS_CONTROL_WIDTH = 140;
+        paddingStyle =
+            window.api?.platform === "darwin"
+                ? `padding-left: ${MACOS_CONTROL_WIDTH}px`
+                : `padding-right: ${WINDOWS_CONTROL_WIDTH}px`;
+
+        // Set initial dark mode
+        document.documentElement.classList.add("dark");
     });
 
-    // Constants for spacing around native window controls
-    const MACOS_CONTROL_WIDTH = 80;
-    const WINDOWS_CONTROL_WIDTH = 140;
-
-    // Determine padding based on OS
-    $: controlsPadding = isMac ? MACOS_CONTROL_WIDTH : WINDOWS_CONTROL_WIDTH;
-    $: paddingStyle = isMac
-        ? `padding-left: ${controlsPadding}px`
-        : `padding-right: ${controlsPadding}px`;
+    function toggleTheme() {
+        isDarkMode = !isDarkMode;
+        if (isDarkMode) {
+            document.documentElement.classList.add("dark");
+        } else {
+            document.documentElement.classList.remove("dark");
+        }
+    }
 </script>
 
-<div class="title-bar" style={paddingStyle}>
-    <div class="window-grip-section">
-        <Grip />
+<div id="titleBar" style={paddingStyle}>
+    <div id="commonLeft-section">
+        <Icon name="grip" class="align-middle window-grip-section" />
+        <Icon name="menu" />
     </div>
-    <!-- Left section - Menu items -->
-    <div class="left-section">
-        <Button variant="ghost" size="sm" class="title-button">
-            <Icon name="menu" />
-        </Button>
-        <Button variant="ghost" size="sm" class="title-button">
-            <Icon name="source-control" />
-        </Button>
-        <Button variant="ghost" size="sm" class="title-button">
-            <Icon name="extensions" />
-        </Button>
-    </div>
+    <div id="dynamicCenter-section">
+        <div class="left-section">
+            <Button variant="ghost" size="sm" class="title-button">
+                <Icon name="menu" />
+            </Button>
+            <Button variant="ghost" size="sm" class="title-button">
+                <Icon name="source-control" />
+            </Button>
+            <Button variant="ghost" size="sm" class="title-button">
+                <Icon name="extensions" />
+            </Button>
+        </div>
 
-    <!-- Center section - Search/Command palette -->
-    <div class="center-section">
-        <div class="search-container">
-            <Icon name="search" class_name="search-icon" />
-            <input
-                type="text"
-                placeholder="Search or Command (Ctrl+Shift+P)"
-                class="search-input"
-            />
+        <!-- Center section - Search/Command palette -->
+        <div class="center-section">
+            <div class="search-container">
+                <Icon name="search" />
+                <input
+                    type="text"
+                    placeholder="Search or Command (Ctrl+Shift+P)"
+                    class="search-input"
+                />
+            </div>
+        </div>
+
+        <!-- Right section - Panel controls -->
+        <div class="right-section">
+            <Button variant="ghost" size="sm" class="title-button">
+                <Icon name="layout-panel" />
+            </Button>
+            <Button variant="ghost" size="sm" class="title-button">
+                <Icon name="layout-sidebar-right" />
+            </Button>
+            <Button variant="ghost" size="sm" class="title-button">
+                <Icon name="layout-statusbar" />
+            </Button>
         </div>
     </div>
 
-    <!-- Right section - Panel controls -->
-    <div class="right-section">
-        <Button variant="ghost" size="sm" class="title-button">
-            <Icon name="layout-panel" />
-        </Button>
-        <Button variant="ghost" size="sm" class="title-button">
-            <Icon name="layout-sidebar-right" />
-        </Button>
-        <Button variant="ghost" size="sm" class="title-button">
-            <Icon name="layout-statusbar" />
+    <div id="commonRight-section">
+        <Button
+            variant="ghost"
+            size="icon"
+            onclick={toggleTheme}
+            class="theme-toggle"
+        >
+            {#if isDarkMode}
+                <!-- <Icon name="Moon" /> -->
+                <Moon size={24} />
+            {:else}
+                <!-- <Icon name="Sun" /> -->
+                <Sun size={24} />
+            {/if}
         </Button>
         {#if import.meta.env.DEV}
             <Devtools />
@@ -78,71 +95,54 @@
     </div>
 </div>
 
-<style>
-    .title-bar {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        height: 35px;
-        background-color: var(--background);
-        border-bottom: 1px solid var(--border);
-        padding: 0 8px;
-        font-size: 13px;
-        user-select: none;
+<style lang="postcss">
+    #titleBar {
+        @apply flex items-center w-full h-10 bg-[hsl(var(--background))] text-[hsl(var(--secondary-foreground))];
     }
-    .window-grip-section {
-        -webkit-app-region: drag;
-        padding-right: 8px;
+
+    #commonLeft-section {
+        @apply flex items-center justify-between w-14 h-full bg-[hsl(var(--background))];
+    }
+
+    #dynamicCenter-section {
+        @apply flex-1 flex items-center bg-[hsl(var(--accent))] rounded-t-lg mx-2 overflow-hidden h-9 mt-1;
     }
 
     .left-section,
+    .center-section,
     .right-section {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        -webkit-app-region: no-drag;
+        @apply flex items-center space-x-1 p-1;
+    }
+
+    .left-section {
+        @apply flex-grow-0;
     }
 
     .center-section {
-        flex: 1;
-        display: flex;
-        justify-content: center;
-        -webkit-app-region: no-drag;
-        padding: 0 32px;
+        @apply flex-grow justify-center;
+    }
+
+    .right-section {
+        @apply flex-grow-0;
+    }
+
+    #commonRight-section {
+        @apply flex items-center justify-center w-24 h-full bg-[hsl(var(--background))];
     }
 
     .search-container {
-        position: relative;
-        width: 100%;
-        max-width: 600px;
-        display: flex;
-        align-items: center;
+        @apply flex items-center w-full max-w-md;
     }
 
     .search-input {
-        width: 100%;
-        height: 24px;
-        background-color: var(--background-secondary);
-        border: 1px solid transparent;
-        border-radius: 4px;
-        padding: 0 8px 0 32px;
-        font-size: 12px;
-        color: var(--foreground);
-        transition: border-color 0.2s;
+        @apply w-full bg-transparent border-none outline-none text-[hsl(var(--secondary-foreground))] placeholder-neutral-500 pl-2;
     }
 
-    .search-input:focus {
-        outline: none;
-        border-color: var(--border);
+    .title-button {
+        @apply hover:bg-neutral-700;
     }
 
-    :global(.title-button) {
-        height: 28px;
-        padding: 0 6px;
-        color: var(--foreground);
-    }
-
-    :global(.title-button:hover) {
-        background-color: var(--accent);
+    .theme-toggle {
+        @apply text-[hsl(var(--secondary-foreground))] hover:bg-neutral-700;
     }
 </style>

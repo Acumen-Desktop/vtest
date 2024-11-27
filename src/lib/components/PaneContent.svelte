@@ -1,28 +1,32 @@
 <script lang="ts">
   import { paneStore } from "$lib/stores/paneStore";
-  import type { PaneId } from "$lib/types/pane";
-  import { fade, slide } from "svelte/transition";
-  import { onMount, onDestroy } from "svelte";
+  import type {
+    PaneId,
+    PaneState,
+    PaneContent as PaneContentType,
+  } from "$lib/types/pane";
 
-  export let paneId: PaneId;
+  const { paneId } = $props<{ paneId: PaneId }>();
 
-  let error: string | null = null;
-  $: content = $paneStore[paneId];
+  let error = $state<string | null>(null);
+  let content = $derived<PaneContentType | null>(
+    $paneStore[paneId as keyof PaneState],
+  );
 
-  onMount(() => {
+  $effect(() => {
     try {
-      paneStore.loadState();
+      paneStore.loadFromStorage();
     } catch (e) {
       console.error("Failed to load pane state:", e);
     }
-  });
 
-  onDestroy(() => {
-    try {
-      paneStore.saveState();
-    } catch (e) {
-      console.error("Failed to save pane state:", e);
-    }
+    return () => {
+      try {
+        paneStore.saveToStorage();
+      } catch (e) {
+        console.error("Failed to save pane state:", e);
+      }
+    };
   });
 
   function handleRemove() {
@@ -35,9 +39,9 @@
   }
 </script>
 
-<div class="pane-wrapper" transition:fade={{ duration: 200 }}>
+<div class="pane-wrapper">
   {#if error}
-    <div class="error-message" transition:slide>
+    <div class="error-message">
       {error}
     </div>
   {/if}
@@ -51,7 +55,7 @@
       </div>
       <div class="header-right">
         {#if content.closeable}
-          <button class="close-button" on:click={handleRemove} title="Close">
+          <button class="close-button" onclick={handleRemove} title="Close">
             ×
           </button>
         {/if}
@@ -59,13 +63,15 @@
     </div>
     <div class="pane-content">
       {#key content.id}
-        <div transition:fade={{ duration: 150 }}>
-          <svelte:component this={content.component} {...content.props} />
+        <div>
+          {#if content.component}
+            {content.component(content.props)}
+          {/if}
         </div>
       {/key}
     </div>
   {:else}
-    <div class="empty-pane" transition:fade>
+    <div class="empty-pane">
       <span>Empty Pane</span>
     </div>
   {/if}
@@ -80,6 +86,7 @@
     border-radius: 4px;
     overflow: hidden;
     position: relative;
+    animation: fadeIn 200ms ease-out;
   }
 
   .error-message {
@@ -92,6 +99,7 @@
     color: white;
     text-align: center;
     z-index: 100;
+    animation: slideIn 150ms ease-out;
   }
 
   .pane-header {
@@ -141,5 +149,24 @@
     justify-content: center;
     color: var(--muted-foreground);
     font-size: 0.875rem;
+    animation: fadeIn 150ms ease-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideIn {
+    from {
+      transform: translateY(-100%);
+    }
+    to {
+      transform: translateY(0);
+    }
   }
 </style>

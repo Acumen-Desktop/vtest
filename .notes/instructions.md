@@ -1,7 +1,7 @@
-# VTest Project Instructions and Standards
+# FAP-Core Project Instructions and Standards
 
 ## Project Overview
-VTest is an Electron application built with SvelteKit and TypeScript. The project serves as a testing/demo environment for codec-xyz functionality.
+FAP-Core is an Electron v33 desktop application built with Svelte v5, SvelteKit v2, Electron Forge v7, Shadcn-Svelte, Vite v5 and TypeScript v5. The project serves as a core foundation for Freedom Application Platform.
 
 ## Project Structure
 ```
@@ -106,7 +106,7 @@ Once copied, use the Icon component to display the icon:
 ### Running the Application
 1. Start in development mode:
 ```bash
-npm run dev
+npm run start
 ```
 2. Build for production:
 ```bash
@@ -126,22 +126,6 @@ npm run build
 4. Update window management if required
 5. Add appropriate logging
 6. Test in both development and production modes
-
-## Common Issues and Solutions
-1. Button/UI not responding:
-   - Check IPC channel whitelist in preload.ts
-   - Verify event listeners are properly set up
-   - Check console for errors
-
-2. Windows not showing/hiding properly:
-   - Verify WindowManager state
-   - Check IPC communication flow
-   - Ensure proper visibility broadcasting
-
-3. State synchronization issues:
-   - Review IPC message flow
-   - Check state update handlers
-   - Verify reactive statements
 
 ## Future Considerations
 - Document new patterns as they emerge

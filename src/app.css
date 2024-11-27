@@ -3,88 +3,69 @@
 @tailwind utilities;
 
 @layer base {
+  /* Named Color Definitions */
   :root {
-    /* Core colors */
-    --background: 0 0% 100%;
-    --foreground: 224 71.4% 4.1%;
-    
-    /* Component colors */
-    --muted: 220 14.3% 95.9%;
-    --muted-foreground: 220 8.9% 46.1%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 224 71.4% 4.1%;
-    --card: 0 0% 100%;
-    --card-foreground: 224 71.4% 4.1%;
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    
-    /* Interactive elements */
-    --primary: 220.9 39.3% 11%;
-    --primary-foreground: 210 20% 98%;
-    --secondary: 220 14.3% 95.9%;
-    --secondary-foreground: 220.9 39.3% 11%;
-    --accent: 220 14.3% 95.9%;
-    --accent-foreground: 220.9 39.3% 11%;
-    --destructive: 0 72.2% 50.6%;
-    --destructive-foreground: 210 20% 98%;
-    --ring: 224 71.4% 4.1%;
-    
-    /* Layout */
-    --radius: 0.5rem;
-    
-    /* Sidebar specific */
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-    
-    /* Typography */
-    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-    font-synthesis: none;
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    /* Basic Colors */
+    --black: 0 0% 0%;
+    --white: 0 0% 100%;
+    --gray-50: 220 14.3% 95.9%;
+    --gray-100: 220 8.9% 46.1%;
+    --gray-900: 224 71.4% 4.1%;
+    --gray-950: 224 71.4% 4.1%;
+
+    /* Accent Colors */
+    --purple: 262.1 83.3% 57.8%;
+    --deep-purple: 263.4 70% 50.4%;
+    --red: 0 72.22% 50.59%;
+    --dark-red: 0 62.8% 30.6%;
+    --blue: 220.9 39.3% 11%;
+    --dark-blue: 215 27.9% 16.9%;
+    --slate-gray: 217.9 10.6% 64.9%;
+
+    /* Light Theme Colors */
+    --background: var(--white);
+    --foreground: var(--gray-900);
+    --card: var(--white);
+    --card-foreground: var(--gray-900);
+    --popover: var(--white);
+    --popover-foreground: var(--gray-900);
+    --primary: var(--deep-purple);
+    --primary-foreground: var(--white);
+    --secondary: var(--dark-blue);
+    --secondary-foreground: var(--white);
+    --muted: var(--dark-blue);
+    --muted-foreground: var(--slate-gray);
+    --accent: var(--dark-blue);
+    --accent-foreground: var(--white);
+    --destructive: var(--dark-red);
+    --destructive-foreground: var(--white);
+    --border: var(--dark-blue);
+    --input: var(--dark-blue);
+    --ring: var(--deep-purple);
+    --radius: 0.75rem;
   }
 
+  /* Dark Theme Colors */
   .dark {
-    /* Core colors */
-    --background: 224 71.4% 4.1%;
-    --foreground: 210 20% 98%;
-    
-    /* Component colors */
-    --muted: 215 27.9% 16.9%;
-    --muted-foreground: 217.9 10.6% 64.9%;
-    --popover: 224 71.4% 4.1%;
-    --popover-foreground: 210 20% 98%;
-    --card: 224 71.4% 4.1%;
-    --card-foreground: 210 20% 98%;
-    --border: 215 27.9% 16.9%;
-    --input: 215 27.9% 16.9%;
-    
-    /* Interactive elements */
-    --primary: 210 20% 98%;
-    --primary-foreground: 220.9 39.3% 11%;
-    --secondary: 215 27.9% 16.9%;
-    --secondary-foreground: 210 20% 98%;
-    --accent: 215 27.9% 16.9%;
-    --accent-foreground: 210 20% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 20% 98%;
-    --ring: 216 12.2% 83.9%;
-    
-    /* Sidebar specific */
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --background: var(--gray-950);
+    --foreground: var(--white);
+    --card: var(--gray-950);
+    --card-foreground: var(--white);
+    --popover: var(--gray-950);
+    --popover-foreground: var(--white);
+    --primary: var(--deep-purple);
+    --primary-foreground: var(--white);
+    --secondary: var(--dark-blue);
+    --secondary-foreground: var(--white);
+    --muted: var(--dark-blue);
+    --muted-foreground: var(--slate-gray);
+    --accent: var(--dark-blue);
+    --accent-foreground: var(--white);
+    --destructive: var(--dark-red);
+    --destructive-foreground: var(--white);
+    --border: var(--dark-blue);
+    --input: var(--dark-blue);
+    --ring: var(--deep-purple);
   }
 
   * {
@@ -94,4 +75,15 @@
   body {
     @apply bg-background text-foreground;
   }
+  .full {
+        width: 100vw;
+        height: 100vh;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+    }
+    .titleBarIcon{
+        width: 22px;
+        height: 22px;
+    }
 }
