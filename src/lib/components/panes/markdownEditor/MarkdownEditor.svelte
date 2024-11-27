@@ -1,4 +1,5 @@
 <script lang="ts">
+  import MarkdownToolbar from "./MarkdownToolbar.svelte";
   import { onMount } from "svelte";
   import { EditorState } from "@codemirror/state";
   import { EditorView } from "@codemirror/view";
@@ -8,33 +9,7 @@
   import { oneDark } from "@codemirror/theme-one-dark";
   import { marked } from "marked";
   import DOMPurify from "dompurify";
-  import { Button } from "$lib/components/ui/button";
-  import { Separator } from "$lib/components/ui/separator";
-  import {
-    ToggleGroup,
-    ToggleGroupItem,
-  } from "$lib/components/ui/toggle-group";
-  import * as Tooltip from "$lib/components/ui/tooltip";
-  import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
-  import {
-    Bold,
-    Italic,
-    Strikethrough,
-    Heading1,
-    Heading2,
-    Heading3,
-    List,
-    ListOrdered,
-    CheckSquare,
-    Quote,
-    Code2,
-    Table,
-    Link2,
-    Image,
-    Minus,
-    FileText,
-    ChevronDown,
-  } from "lucide-svelte";
+  import type { ComponentProps } from "svelte";
 
   const initialValue = `# Welcome to Markdown Editor
 
@@ -48,7 +23,7 @@ Type your **Markdown** here and see the *live preview* on the right!
 
   let editorContainer: HTMLDivElement;
   let previewContainer: HTMLDivElement;
-  let editorView: EditorView;
+  let editorView = $state<EditorView | undefined>(undefined);
 
   let value = $state(initialValue);
   let renderedHtml = $state(initialValue);
@@ -66,194 +41,6 @@ Type your **Markdown** here and see the *live preview* on the right!
     }
     parseMarkdown();
   });
-
-  type FormatAction = {
-    icon: any;
-    label: string;
-    markdown: string;
-    cursorOffset?: number;
-    block?: boolean;
-    tooltip: string;
-  };
-
-  let activeFormats = $state(new Set<string>());
-
-  const formatActions: Record<string, FormatAction[]> = {
-    text: [
-      {
-        icon: Bold,
-        label: "Bold",
-        markdown: "**",
-        tooltip: "**bold**",
-      },
-      {
-        icon: Italic,
-        label: "Italic",
-        markdown: "*",
-        tooltip: "*italic*",
-      },
-      {
-        icon: Strikethrough,
-        label: "Strikethrough",
-        markdown: "~~",
-        tooltip: "~~strikethrough~~",
-      },
-    ],
-    headers: [
-      {
-        icon: Heading1,
-        label: "H1",
-        markdown: "# ",
-        cursorOffset: 2,
-        block: true,
-        tooltip: "# Heading 1",
-      },
-      {
-        icon: Heading2,
-        label: "H2",
-        markdown: "## ",
-        cursorOffset: 3,
-        block: true,
-        tooltip: "## Heading 2",
-      },
-      {
-        icon: Heading3,
-        label: "H3",
-        markdown: "### ",
-        cursorOffset: 4,
-        block: true,
-        tooltip: "### Heading 3",
-      },
-    ],
-    lists: [
-      {
-        icon: List,
-        label: "Bullet List",
-        markdown: "- ",
-        cursorOffset: 2,
-        block: true,
-        tooltip: "- bullet list",
-      },
-      {
-        icon: ListOrdered,
-        label: "Numbered List",
-        markdown: "1. ",
-        cursorOffset: 3,
-        block: true,
-        tooltip: "1. numbered list",
-      },
-      {
-        icon: CheckSquare,
-        label: "Task List",
-        markdown: "- [ ] ",
-        cursorOffset: 6,
-        block: true,
-        tooltip: "- [ ] task list",
-      },
-    ],
-    blocks: [
-      {
-        icon: Quote,
-        label: "Quote",
-        markdown: "> ",
-        cursorOffset: 2,
-        block: true,
-        tooltip: "> blockquote",
-      },
-      {
-        icon: Code2,
-        label: "Code Block",
-        markdown: "```\n\n```",
-        cursorOffset: 4,
-        block: true,
-        tooltip: "```code block```",
-      },
-      {
-        icon: Table,
-        label: "Table",
-        markdown:
-          "| Header | Header |\n|---------|----------|\n| Cell | Cell |",
-        cursorOffset: 2,
-        block: true,
-        tooltip: "Insert table",
-      },
-    ],
-    media: [
-      {
-        icon: Link2,
-        label: "Link",
-        markdown: "[]()",
-        cursorOffset: 1,
-        tooltip: "[text](url)",
-      },
-      {
-        icon: Image,
-        label: "Image",
-        markdown: "![]()",
-        cursorOffset: 2,
-        tooltip: "![alt text](url)",
-      },
-    ],
-    special: [
-      {
-        icon: Minus,
-        label: "Horizontal Rule",
-        markdown: "\n---\n",
-        cursorOffset: 5,
-        block: true,
-        tooltip: "Horizontal rule",
-      },
-      {
-        icon: FileText,
-        label: "Table of Contents",
-        markdown: "[TOC]\n\n",
-        cursorOffset: 6,
-        block: true,
-        tooltip: "Table of contents",
-      },
-    ],
-  };
-
-  function applyFormat(action: FormatAction) {
-    if (!editorView) return;
-
-    const state = editorView.state;
-    const { from, to } = state.selection.main;
-    const selectedText = state.sliceDoc(from, to);
-
-    let insertText = "";
-    let cursorOffset = action.cursorOffset;
-
-    if (from === to) {
-      // No text selected
-      insertText = action.markdown;
-    } else {
-      // Text selected
-      if (action.block) {
-        // For block-level elements, apply to each line
-        const lines = selectedText.split("\n");
-        insertText = lines.map((line) => action.markdown + line).join("\n");
-        cursorOffset =
-          selectedText.length + action.markdown.length * lines.length;
-      } else {
-        // For inline elements, wrap the selection
-        const [start, end] = action.markdown.split(
-          action.cursorOffset === 1 ? "*" : "**",
-        );
-        insertText = start + selectedText + (end || start);
-        cursorOffset = selectedText.length + action.markdown.length;
-      }
-    }
-
-    editorView.dispatch({
-      changes: { from, to, insert: insertText },
-      selection: {
-        anchor: from + (action.cursorOffset ?? action.markdown.length),
-      },
-    });
-
-    editorView.focus();
-  }
 
   onMount(() => {
     // Create the editor
@@ -279,162 +66,15 @@ Type your **Markdown** here and see the *live preview* on the right!
     });
 
     return () => {
-      editorView.destroy();
+      if (editorView) {
+        editorView.destroy();
+      }
     };
   });
 </script>
 
 <div class="markdown-editor-container">
-  <Tooltip.Provider>
-    <div class="editor-toolbar">
-      <!-- Text formatting -->
-      <div class="toolbar-group">
-        {#each formatActions.text as action}
-          <Tooltip.Root>
-            <Tooltip.Trigger>
-              <Button
-                variant="ghost"
-                size="sm"
-                data-state={activeFormats.has(action.label) ? "on" : "off"}
-                onclick={() => {
-                  if (activeFormats.has(action.label)) {
-                    activeFormats.delete(action.label);
-                  } else {
-                    activeFormats.add(action.label);
-                  }
-                  applyFormat(action);
-                }}
-                class="hover:bg-gray-200 dark:hover:bg-gray-700"
-              >
-                {#key action.icon}
-                  <action.icon size={16} />
-                {/key}
-              </Button>
-            </Tooltip.Trigger>
-            <Tooltip.Content>{action.tooltip}</Tooltip.Content>
-          </Tooltip.Root>
-        {/each}
-      </div>
-
-      <Separator orientation="vertical" class="h-8" />
-
-      <!-- Headers dropdown -->
-      <div class="toolbar-group">
-        <DropdownMenu.Root>
-          <DropdownMenu.Trigger>
-            <Button variant="ghost" size="sm" class="toolbar-btn">
-              <Heading1 size={16} />
-              <ChevronDown size={16} class="ml-1" />
-            </Button>
-          </DropdownMenu.Trigger>
-          <DropdownMenu.Content align="start" class="w-56">
-            {#each formatActions.headers as action}
-              <DropdownMenu.Item onclick={() => applyFormat(action)}>
-                <div class="flex items-center">
-                  <action.icon size={16} class="mr-2" />
-                  <span>{action.label}</span>
-                  <span class="text-muted-foreground ml-auto text-xs"
-                    >{action.tooltip}</span
-                  >
-                </div>
-              </DropdownMenu.Item>
-            {/each}
-          </DropdownMenu.Content>
-        </DropdownMenu.Root>
-      </div>
-
-      <Separator orientation="vertical" class="h-8" />
-
-      <!-- Lists -->
-      <div class="toolbar-group">
-        {#each formatActions.lists as action}
-          <Tooltip.Root>
-            <Tooltip.Trigger>
-              <Button
-                variant="ghost"
-                size="sm"
-                onclick={() => applyFormat(action)}
-              >
-                {#key action.icon}
-                  <action.icon size={16} />
-                {/key}
-              </Button>
-            </Tooltip.Trigger>
-            <Tooltip.Content>{action.tooltip}</Tooltip.Content>
-          </Tooltip.Root>
-        {/each}
-      </div>
-
-      <Separator orientation="vertical" class="h-8" />
-
-      <!-- Blocks -->
-      <div class="toolbar-group">
-        {#each formatActions.blocks as action}
-          <Tooltip.Root>
-            <Tooltip.Trigger>
-              <Button
-                variant="ghost"
-                size="sm"
-                onclick={() => applyFormat(action)}
-              >
-                {#key action.icon}
-                  <action.icon size={16} />
-                {/key}
-              </Button>
-            </Tooltip.Trigger>
-            <Tooltip.Content>{action.tooltip}</Tooltip.Content>
-          </Tooltip.Root>
-        {/each}
-      </div>
-
-      <Separator orientation="vertical" class="h-8" />
-
-      <!-- Media -->
-      <div class="toolbar-group">
-        {#each formatActions.media as action}
-          <Tooltip.Root>
-            <Tooltip.Trigger>
-              <Button
-                variant="ghost"
-                size="sm"
-                onclick={() => applyFormat(action)}
-              >
-                {#key action.icon}
-                  <action.icon size={16} />
-                {/key}
-              </Button>
-            </Tooltip.Trigger>
-            <Tooltip.Content>{action.tooltip}</Tooltip.Content>
-          </Tooltip.Root>
-        {/each}
-      </div>
-
-      <Separator orientation="vertical" class="h-8" />
-
-      <!-- Special -->
-      <div class="toolbar-group">
-        {#each formatActions.special as action}
-          <Tooltip.Root>
-            <Tooltip.Trigger>
-              <Button
-                variant="ghost"
-                size="sm"
-                onclick={() => applyFormat(action)}
-              >
-                {#key action.icon}
-                  <action.icon size={16} />
-                {/key}
-              </Button>
-            </Tooltip.Trigger>
-            <Tooltip.Content>{action.tooltip}</Tooltip.Content>
-          </Tooltip.Root>
-        {/each}
-      </div>
-
-      <div class="flex-1"></div>
-      <span class="stats">Words: {wordCount} | Chars: {characterCount}</span>
-    </div>
-  </Tooltip.Provider>
+  <MarkdownToolbar {editorView} />
 
   <div class="editor-preview-container">
     <div bind:this={editorContainer} class="editor-panel h-full"></div>
@@ -453,20 +93,6 @@ Type your **Markdown** here and see the *live preview* on the right!
     @apply dark:bg-accent;
   }
 
-  .editor-toolbar {
-    @apply flex items-center gap-2 p-2 bg-accent border-b border-border overflow-x-auto;
-    min-height: 3rem; /* Ensure consistent height even when scrolling */
-    @apply dark:bg-accent;
-  }
-
-  .toolbar-group {
-    @apply flex items-center gap-1;
-  }
-
-  :global(.toolbar-btn) {
-    @apply hover:bg-gray-200 dark:hover:bg-gray-700;
-  }
-
   .editor-preview-container {
     @apply flex flex-1 overflow-hidden;
     @apply dark:bg-accent;
@@ -480,20 +106,5 @@ Type your **Markdown** here and see the *live preview* on the right!
 
   .preview-panel {
     @apply border-l border-gray-200 dark:border-gray-700;
-  }
-
-  .stats {
-    @apply text-sm text-gray-500 dark:text-gray-400;
-  }
-
-  /* Add padding to ensure last items are visible when scrolling */
-  .toolbar-group:last-child {
-    @apply pr-4;
-  }
-
-  /* Ensure dropdown content is positioned correctly */
-  :global(.dropdown-content) {
-    position: fixed;
-    z-index: 50;
   }
 </style>
