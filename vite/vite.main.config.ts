@@ -15,6 +15,17 @@ export default defineConfig({
 			external,
 		},
 	},
+	optimizeDeps: {
+		exclude: [
+			'@codemirror/state',
+			'@codemirror/view',
+			'@codemirror/basic-setup',
+			'@codemirror/lang-markdown', 
+			'@codemirror/language-data',
+			'@codemirror/theme-one-dark',
+			'codemirror'
+		]
+	},
 	resolve: {
 		// Load the Node.js entry.
 		mainFields: ['module', 'jsnext:main', 'jsnext'],

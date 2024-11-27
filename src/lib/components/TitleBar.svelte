@@ -108,22 +108,16 @@
         @apply flex-1 flex items-center bg-[hsl(var(--accent))] rounded-t-lg mx-2 overflow-hidden h-9 mt-1;
     }
 
-    .left-section,
-    .center-section,
-    .right-section {
-        @apply flex items-center space-x-1 p-1;
-    }
-
     .left-section {
-        @apply flex-grow-0;
+        @apply flex items-center gap-1 p-1 flex-grow-0;
     }
 
     .center-section {
-        @apply flex-grow justify-center;
+        @apply flex items-center gap-1 p-1 flex-grow justify-center;
     }
 
     .right-section {
-        @apply flex-grow-0;
+        @apply flex items-center gap-1 p-1 flex-grow-0;
     }
 
     #commonRight-section {
@@ -138,11 +132,11 @@
         @apply w-full bg-transparent border-none outline-none text-[hsl(var(--secondary-foreground))] placeholder-neutral-500 pl-2;
     }
 
-    .title-button {
-        @apply hover:bg-neutral-700;
+    :global(.title-button) {
+        @apply hover:bg-neutral-700/50;
     }
 
-    .theme-toggle {
-        @apply text-[hsl(var(--secondary-foreground))] hover:bg-neutral-700;
+    :global(.theme-toggle) {
+        @apply text-[hsl(var(--secondary-foreground))] hover:bg-neutral-700/50;
     }
 </style>
