@@ -284,7 +284,7 @@ Type your **Markdown** here and see the *live preview* on the right!
   });
 </script>
 
-<div class="markdown-editor-container bg-white dark:bg-gray-900">
+<div class="markdown-editor-container">
   <Tooltip.Provider>
     <div class="editor-toolbar">
       <!-- Text formatting -->
@@ -437,14 +437,8 @@ Type your **Markdown** here and see the *live preview* on the right!
   </Tooltip.Provider>
 
   <div class="editor-preview-container">
-    <div
-      bind:this={editorContainer}
-      class="editor-panel bg-white dark:bg-gray-800 h-full"
-    ></div>
-    <div
-      bind:this={previewContainer}
-      class="preview-panel bg-white dark:bg-gray-800"
-    >
+    <div bind:this={editorContainer} class="editor-panel h-full"></div>
+    <div bind:this={previewContainer} class="preview-panel">
       <div class="prose dark:prose-invert max-w-none h-full">
         {@html renderedHtml}
       </div>
@@ -455,11 +449,14 @@ Type your **Markdown** here and see the *live preview* on the right!
 <style lang="postcss">
   .markdown-editor-container {
     @apply h-full flex flex-col;
+    background-color: hsl(var(--accent));
+    @apply dark:bg-accent;
   }
 
   .editor-toolbar {
     @apply flex items-center gap-2 p-2 bg-accent border-b border-border overflow-x-auto;
     min-height: 3rem; /* Ensure consistent height even when scrolling */
+    @apply dark:bg-accent;
   }
 
   .toolbar-group {
@@ -472,11 +469,13 @@ Type your **Markdown** here and see the *live preview* on the right!
 
   .editor-preview-container {
     @apply flex flex-1 overflow-hidden;
+    @apply dark:bg-accent;
   }
 
   .editor-panel,
   .preview-panel {
     @apply w-1/2 h-full overflow-auto p-4;
+    @apply dark:bg-accent;
   }
 
   .preview-panel {

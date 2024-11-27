@@ -29,6 +29,6 @@
 		"../forge.env.d.ts",
 		"../forge.config.cts",
 		"../electronForgeVitePlugin.cts",
+		"../.old/MarkdownEditor-composer-broken.svelte",
 	],
-  }
-  
+}
