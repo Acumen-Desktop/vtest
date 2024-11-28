@@ -13,7 +13,8 @@
 		"resolveJsonModule": true,
 		"paths": {
 			"$lib": ["src/lib"],
-			"$lib/*": ["src/lib/*"]
+			"$lib/*": ["src/lib/*"],
+			"$root/*": ["src/*"]
 		},
 		"allowImportingTsExtensions": true,
 		"noEmit": true,

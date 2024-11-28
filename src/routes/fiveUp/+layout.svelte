@@ -1,5 +1,5 @@
 <script lang="ts">
-  import "../app.css";
+  import "$root/app.css";
   import { onMount } from "svelte";
   import TitleBar from "$lib/components/TitleBar.svelte";
   import * as Resizable from "$lib/components/ui/resizable/index.js";
@@ -7,6 +7,7 @@
   import PaneContent from "$lib/components/PaneContent.svelte";
   import { initializeDefaultLayout } from "$lib/utils/initializeLayout";
 
+  // Use $props() for children
   let { children } = $props();
 
   // Create a custom storage interface that uses localStorage
@@ -27,7 +28,8 @@
     };
   }
 
-  onMount(() => {
+  // Use $effect instead of onMount
+  $effect(() => {
     // Initialize the default layout when the component mounts
     initializeDefaultLayout();
   });
@@ -105,6 +107,9 @@
       <PaneContent paneId="footer" />
     </Resizable.Pane>
   </Resizable.PaneGroup>
+
+  <!-- Render children if provided -->
+  {@render children?.()}
 </div>
 
 <style>

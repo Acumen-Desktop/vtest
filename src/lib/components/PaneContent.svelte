@@ -10,7 +10,7 @@
 
   let error = $state<string | null>(null);
   let content = $derived<PaneContentType | null>(
-    $paneStore[paneId as keyof PaneState],
+    $paneStore[paneId as keyof PaneState]
   );
 
   $effect(() => {
@@ -64,8 +64,8 @@
     <div class="pane-content">
       {#key content.id}
         <div>
-          {#if content.component}
-            {content.component(content.props)}
+          {#if content.component && content.props}
+            <svelte:component this={content.component} {...content.props} />
           {/if}
         </div>
       {/key}
@@ -76,6 +76,8 @@
     </div>
   {/if}
 </div>
+
+export default PaneContent;
 
 <style>
   .pane-wrapper {

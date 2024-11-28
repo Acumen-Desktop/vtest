@@ -186,11 +186,12 @@
     const selectedText = state.sliceDoc(from, to);
 
     let insertText = "";
-    let cursorOffset = action.cursorOffset;
+    let newCursor = from;
 
     if (from === to) {
       // No text selected
       insertText = action.markdown;
+      newCursor = from + (action.cursorOffset ?? action.markdown.length);
     } else {
       // Text selected
       if (action.block) {
@@ -199,23 +200,18 @@
         insertText = lines
           .map((line: string) => action.markdown + line)
           .join("\n");
-        cursorOffset =
-          selectedText.length + action.markdown.length * lines.length;
+        newCursor = to + action.markdown.length * lines.length;
       } else {
         // For inline elements, wrap the selection
-        const [start, end] = action.markdown.split(
-          action.cursorOffset === 1 ? "*" : "**"
-        );
-        insertText = start + selectedText + (end || start);
-        cursorOffset = selectedText.length + action.markdown.length;
+        const delimiter = action.markdown;
+        insertText = `${delimiter}${selectedText}${delimiter}`;
+        newCursor = to + delimiter.length * 2;
       }
     }
 
     editorView.dispatch({
       changes: { from, to, insert: insertText },
-      selection: {
-        anchor: from + (action.cursorOffset ?? action.markdown.length),
-      },
+      selection: { anchor: newCursor },
     });
 
     editorView.focus();
@@ -255,7 +251,7 @@
 
 <style lang="postcss">
   .editor-toolbar {
-    @apply flex items-center gap-2 p-2 overflow-x-auto;
+    @apply flex items-center gap-2 p-2 flex-wrap;
     min-height: 3rem;
     background-color: hsl(var(--accent));
     border-bottom: 1px solid hsl(var(--border));
@@ -277,11 +273,5 @@
   /* Add padding to ensure last items are visible when scrolling */
   .toolbar-group:last-child {
     @apply pr-4;
-  }
-
-  /* Ensure dropdown content is positioned correctly */
-  :global(.dropdown-content) {
-    position: fixed;
-    z-index: 50;
   }
 </style>

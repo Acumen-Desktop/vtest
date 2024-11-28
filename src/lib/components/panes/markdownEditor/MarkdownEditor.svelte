@@ -9,7 +9,7 @@
   import { oneDark } from "@codemirror/theme-one-dark";
   import { marked } from "marked";
   import DOMPurify from "dompurify";
-  // import type { ComponentProps } from "svelte";
+  import * as Resizable from "$lib/components/ui/resizable/index.js";
 
   const initialValue = `# Welcome to Markdown Editor
 
@@ -74,27 +74,40 @@ Type your **Markdown** here and see the *live preview* on the right!
 </script>
 
 <div class="markdown-editor-container">
-  <MarkdownToolbar {editorView} />
-
-  <div class="editor-preview-container">
-    <div bind:this={editorContainer} class="editor-panel h-full"></div>
-    <div bind:this={previewContainer} class="preview-panel">
-      <div class="prose dark:prose-invert max-w-none h-full">
-        {@html renderedHtml}
+  <h2 id="markdown-editor-title">Markdown Editor</h2>
+  <Resizable.PaneGroup direction="horizontal">
+    <Resizable.Pane minSize={40} defaultSize={50}>
+      <Resizable.PaneGroup direction="vertical">
+        <Resizable.Pane minSize={35} defaultSize={35}>
+          <MarkdownToolbar {editorView} />
+        </Resizable.Pane>
+        <Resizable.Handle withHandle />
+        <Resizable.Pane>
+          <div bind:this={editorContainer} class="editor-panel h-full"></div>
+        </Resizable.Pane>
+      </Resizable.PaneGroup>
+    </Resizable.Pane>
+    <Resizable.Handle withHandle />
+    <Resizable.Pane minSize={40} defaultSize={50}>
+      <div bind:this={previewContainer} class="preview-panel">
+        <div class="prose dark:prose-invert max-w-none h-full">
+          {@html renderedHtml}
+        </div>
       </div>
-    </div>
-  </div>
+    </Resizable.Pane>
+  </Resizable.PaneGroup>
 </div>
 
 <style lang="postcss">
-  .markdown-editor-container {
-    @apply h-full flex flex-col;
-    background-color: hsl(var(--accent));
-    @apply dark:bg-accent;
+  #markdown-editor-title {
+    height: 40px;
+    @apply text-lg font-semibold text-center;
   }
 
-  .editor-preview-container {
-    @apply flex flex-1 overflow-hidden;
+  .markdown-editor-container {
+    height: calc(100vh - 40px);
+    @apply w-full;
+    background-color: hsl(var(--accent));
     @apply dark:bg-accent;
   }
 
