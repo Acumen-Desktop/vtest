@@ -43,7 +43,7 @@
 
 <style lang="postcss">
   .error-container {
-    @apply flex items-center justify-center min-h-screen bg-background text-foreground p-4;
+    @apply flex items-center justify-center min-h-screen text-foreground p-4;
   }
 
   .error-content {

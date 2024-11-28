@@ -59,6 +59,19 @@ Example:
 console.log("Line 17 - +page.svelte - Window visibility update:", data);
 ```
 
+
+
+### Console Logging
+All console.log statements should follow this format:
+```typescript
+console.log("Line XX - filename - message:", data);
+```
+
+Example:
+```typescript
+console.log("Line 17 - +page.svelte - Window visibility update:", data);
+```
+
 ## Svelte 5 Patterns
 
 ### Component Creation Guidelines

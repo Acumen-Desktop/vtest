@@ -2,7 +2,7 @@
   import MarkdownEditor from "$lib/components/layout/panes/markdownEditor/MarkdownEditor.svelte";
 </script>
 
-<div id="mainPage" class=" bg-[hsl(var(--background))]">
+<div id="mainPage">
   <a href="/test">Test Page</a>
   <a href="/five-up">Five Up Page</a>
   <MarkdownEditor />

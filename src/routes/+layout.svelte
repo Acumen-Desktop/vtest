@@ -8,4 +8,12 @@
 </script>
 
 <TitleBar />
-{@render children()}
+<div class="content-container">
+  {@render children()}
+</div>
+
+<style>
+  .content-container {
+    background-color: hsl(var(--accent));
+  }
+</style>
