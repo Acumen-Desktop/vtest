@@ -1,5 +1,78 @@
 # Project Structure
 
+## Project Metadata
+
+- **Framework**: SvelteKit + Electron
+- **Package Manager**: npm
+- **TypeScript**: Strict mode enabled
+- **UI Framework**: Tailwind CSS + shadcn-svelte
+- **Key Dependencies**:
+  - Electron v33
+  - Svelte v5
+  - Vite v6
+  - TypeScript v5.7+
+
+## Conventions
+
+- File naming: kebab-case (e.g., `file-name.ts`)
+- Component naming: PascalCase (e.g., `MyComponent.svelte`)
+- Route files: SvelteKit conventions (`+page.svelte`, `+layout.svelte`)
+- Imports: Use aliases (`$lib`, `$root`, `$panes`)
+- Styles: Tailwind classes with shadcn-svelte components
+
+## Svelte 5 Patterns
+
+### Component Creation Guidelines
+
+- Use `$state()` for reactive state management
+- Use `$props()` for component properties
+- Use `onclick` instead of `on:click` for event handling
+- Implement modern Svelte 5 reactive patterns
+- Avoid Svelte 4 syntax completely
+
+### Example Component Structure
+
+```svelte
+<script lang="ts">
+  // Props using $props()
+  const { title = "Default" } = $props<{ title?: string }>();
+
+  // State using $state()
+  const count = $state(0);
+  const items = $state<string[]>([]);
+
+  // Derived state
+  const doubled = count * 2;
+
+  // Event handlers (use 'onclick', not 'on:click')
+  function handleClick() {
+    count++;
+    items = [...items, `Item ${count}`];
+  }
+</script>
+
+<div class="container">
+  <h1>{title}</h1>
+  <button onclick={handleClick}>
+    Count: {count}
+  </button>
+  <p>Doubled: {doubled}</p>
+
+  {#each items as item}
+    <div>{item}</div>
+  {/each}
+</div>
+```
+
+### Key Differences from Svelte 4
+
+- No more `export let` for props
+- No more `$:` for reactivity
+- Event handlers use `onclick` syntax
+- State management with `$state()`
+- Props management with `$props()`
+- TypeScript integration is more straightforward
+
 ## Directory Tree
 
 ```
@@ -230,22 +303,27 @@ src//
 ## Directory Purposes
 
 ### Routes (`/routes`)
+
 File-based routing structure for the application:
+
 - `five-up/`: Five-pane layout implementation
 - `editor/`: Code editor interface
 - `settings/`: Application configuration interface
 - `test/`: Testing environment
 
 ### Library (`/lib`)
+
 Shared codebase organized by functionality:
 
 #### Components (`/lib/components`)
+
 - `layout/panes/`: Core pane components for the editor interface
 - `ui/`: shadcn-svelte component library
 - `buttons/`: Custom button implementations
 - `common/`: Shared generic components
 
 #### Core Functionality
+
 - `stores/`: Global state management
 - `utils/`: Utility functions and helpers
 - `services/`: API and service implementations
@@ -255,6 +333,7 @@ Shared codebase organized by functionality:
 - `assets/`: Static resources
 
 ### Application Core
+
 - `styles/`: Global styling
 - `hooks/`: Svelte hooks and middleware
 - `electron/`: Electron-specific implementations
@@ -262,8 +341,18 @@ Shared codebase organized by functionality:
 - `tsconfig.json`: TypeScript configuration
 
 ## Recent Changes
+
 - Reorganized pane components under layout/
 - Added services/ and constants/ directories
 - Implemented five-up layout structure
 - Added electron-specific directory
 - Separated UI components by function
+
+## Development Notes
+
+- All new components should follow shadcn-svelte patterns
+- Electron-specific code goes in `src/electron/`
+- Shared utilities should be placed in `src/lib/utils/`
+- New routes should include appropriate layouts
+- Component-specific types should be co-located with components
+- Global types go in `src/lib/types/`

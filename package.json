@@ -17,7 +17,8 @@
 		"test": "vitest",
 		"update:deps": "npx npm-check-updates -u && npm install",
 		"copy-icon": "tsx src/lib/utils/copy-icons.ts",
-		"update-docs": "tsx scripts/update-folder-structure.ts",
+		"update-docs": "tsx scripts/update-project-docs.ts",
+		"generate-docs": "tsx scripts/docs/generate-docs.ts",
 		"prepare": "husky install"
 	},
 	"devDependencies": {
