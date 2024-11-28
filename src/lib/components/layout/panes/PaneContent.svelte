@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { paneStore } from "$lib/stores/paneStore";
+  import { paneStore } from "../../../stores/paneStore";
   import type {
     PaneId,
     PaneState,

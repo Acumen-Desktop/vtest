@@ -1,9 +1,9 @@
 import { paneStore } from "$lib/stores/paneStore";
-import Welcome from "$lib/components/panes/Welcome.svelte";
-import FileExplorer from "$lib/components/panes/FileExplorer.svelte";
-import CodeEditor from "$lib/components/panes/CodeEditor.svelte";
-import Terminal from "$lib/components/panes/Terminal.svelte";
-import type { PaneId, PaneContent } from "$lib/types/pane";
+import Welcome from "$lib/components/layout/panes/Welcome.svelte";
+import FileExplorer from "$lib/components/layout/panes/FileExplorer.svelte";
+import CodeEditor from "$lib/components/layout/panes/CodeEditor.svelte";
+import Terminal from "$lib/components/layout/panes/Terminal.svelte";
+import type { PaneId, PaneContent } from "../types/pane";
 
 // Define the default layout configuration
 export const defaultLayout: Record<PaneId, PaneContent> = {

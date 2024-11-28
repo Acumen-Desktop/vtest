@@ -1,44 +1,42 @@
 <script lang="ts">
-	import { ToggleGroup as ToggleGroupPrimitive } from "bits-ui";
-	import { type ToggleVariants, getToggleGroupCtx } from "./index.js";
-	import { cn } from "$lib/utils.js";
-	import { toggleVariants } from "$lib/components/ui/toggle/index.js";
+  import { ToggleGroup as ToggleGroupPrimitive } from "bits-ui";
+  import { type ToggleVariants, getToggleGroupCtx } from "./index.js";
+  import { cn } from "../../../utils/utils.js";
+  import { toggleVariants } from "$lib/components/ui/toggle/index.js";
 
-	type $$Props = ToggleGroupPrimitive.ItemProps & ToggleVariants;
+  type $$Props = ToggleGroupPrimitive.ItemProps & ToggleVariants;
 
+  interface Props {
+    class?: string | undefined | null;
+    variant?: $$Props["variant"];
+    size?: $$Props["size"];
+    value: $$Props["value"];
+    children?: import("svelte").Snippet;
+    [key: string]: any;
+  }
 
-	
-	interface Props {
-		class?: string | undefined | null;
-		variant?: $$Props["variant"];
-		size?: $$Props["size"];
-		value: $$Props["value"];
-		children?: import('svelte').Snippet;
-		[key: string]: any
-	}
+  let {
+    class: className = undefined,
+    variant = "default",
+    size = "default",
+    value,
+    children,
+    ...rest
+  }: Props = $props();
 
-	let {
-		class: className = undefined,
-		variant = "default",
-		size = "default",
-		value,
-		children,
-		...rest
-	}: Props = $props();
-
-	const ctx = getToggleGroupCtx();
+  const ctx = getToggleGroupCtx();
 </script>
 
 <ToggleGroupPrimitive.Item
-	class={cn(
-		toggleVariants({
-			variant: ctx.variant || variant,
-			size: ctx.size || size,
-		}),
-		className
-	)}
-	{value}
-	{...rest}
+  class={cn(
+    toggleVariants({
+      variant: ctx.variant || variant,
+      size: ctx.size || size,
+    }),
+    className
+  )}
+  {value}
+  {...rest}
 >
-	{@render children?.()}
+  {@render children?.()}
 </ToggleGroupPrimitive.Item>

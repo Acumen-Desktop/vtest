@@ -1,9 +1,9 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { paneStore } from "$lib/stores/paneStore";
-  import FileExplorer from "$lib/components/panes/FileExplorer.svelte";
-  import CodeEditor from "$lib/components/panes/CodeEditor.svelte";
-  import Terminal from "$lib/components/panes/Terminal.svelte";
+  import { paneStore } from "../../lib/stores/paneStore";
+  import FileExplorer from "$lib/components/layout/panes/FileExplorer.svelte";
+  import CodeEditor from "$lib/components/layout/panes/CodeEditor.svelte";
+  import Terminal from "$lib/components/layout/panes/Terminal.svelte";
   import type { FileNode } from "$lib/types/fileExplorer";
   import type { PaneId } from "$lib/types/pane";
 

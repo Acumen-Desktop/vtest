@@ -1,7 +1,7 @@
 // src/lib/stores/paneStore.ts
 import { writable, get } from "svelte/store";
-import type { PaneState, PaneId, PaneContent } from "$lib/types/pane";
-import { isPaneId } from "$lib/types/pane";
+import type { PaneState, PaneId, PaneContent } from "../types/pane";
+import { isPaneId } from "../types/pane";
 
 const STORAGE_KEY = "paneState";
 
@@ -66,7 +66,7 @@ function createPaneStore() {
           const state = JSON.parse(stored);
           set(state);
         } catch (e) {
-          console.error('Failed to load pane state from storage:', e);
+          console.error("Failed to load pane state from storage:", e);
         }
       }
     },
@@ -75,7 +75,7 @@ function createPaneStore() {
     saveToStorage: () => {
       const state = get({ subscribe });
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    }
+    },
   };
 }
 

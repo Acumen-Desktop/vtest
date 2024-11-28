@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Update folder structure documentation
+npm run update-docs
+
+# Stage the updated documentation if it was changed
+git diff --quiet .notes/folderStructure.md || git add .notes/folderStructure.md 

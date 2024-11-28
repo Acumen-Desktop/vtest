@@ -1,5 +1,5 @@
 <script lang="ts">
-  import FileExplorer from "$lib/components/panes/FileExplorer.svelte";
+  import FileExplorer from "$lib/components/layout/panes/FileExplorer.svelte";
 </script>
 
 <FileExplorer />

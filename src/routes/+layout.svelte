@@ -1,10 +1,10 @@
 <script lang="ts">
-    import type { Snippet } from "svelte";
-    import type { LayoutData } from "./$types";
-    import TitleBar from "$lib/components/TitleBar.svelte";
-    import "../app.css";
+  import type { Snippet } from "svelte";
+  import type { LayoutData } from "./$types";
+  import TitleBar from "$lib/components/layout/TitleBar.svelte";
+  import "../app.css";
 
-    let { data, children }: { data: LayoutData; children: Snippet } = $props();
+  let { data, children }: { data: LayoutData; children: Snippet } = $props();
 </script>
 
 <TitleBar />

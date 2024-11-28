@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Button } from "$lib/components/ui/button";
-  import Devtools from "./Devtools.svelte";
-  import Icon from "$lib/components/Icon.svelte";
+  import Devtools from "../buttons/Devtools.svelte";
+  import Icon from "$lib/components/common/Icon.svelte";
   import { Moon, Sun, ChevronLeft, ChevronRight } from "lucide-svelte";
   import { page } from "$app/stores";
   import { goto } from "$app/navigation";

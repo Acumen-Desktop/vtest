@@ -1,11 +1,11 @@
 <script lang="ts">
   import "$root/app.css";
   import { onMount } from "svelte";
-  import TitleBar from "$lib/components/TitleBar.svelte";
+  import TitleBar from "$lib/components/layout/TitleBar.svelte";
   import * as Resizable from "$lib/components/ui/resizable/index.js";
-  import { handleLayoutChange } from "$lib/utils/paneLayoutManager";
-  import PaneContent from "$lib/components/PaneContent.svelte";
-  import { initializeDefaultLayout } from "$lib/utils/initializeLayout";
+  import { handleLayoutChange } from "../../lib/utils/paneLayoutManager";
+  import PaneContent from "$lib/components/layout/panes/PaneContent.svelte";
+  import { initializeDefaultLayout } from "../../lib/utils/initializeLayout";
 
   // Use $props() for children
   let { children } = $props();

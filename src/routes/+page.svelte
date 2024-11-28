@@ -1,5 +1,5 @@
 <script lang="ts">
-  import MarkdownEditor from "$lib/components/panes/markdownEditor/MarkdownEditor.svelte";
+  import MarkdownEditor from "$lib/components/layout/panes/markdownEditor/MarkdownEditor.svelte";
 </script>
 
 <div id="mainPage" class=" bg-[hsl(var(--background))]">
