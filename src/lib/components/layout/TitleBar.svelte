@@ -39,23 +39,35 @@
     }
   });
 
+  async function handleNavigation(path: string) {
+    try {
+      console.log("Line 12 - TitleBar.svelte - Navigating to:", path);
+      await goto(path, { replaceState: true });
+    } catch (err: unknown) {
+      // Suppress the error as it will be handled by the error page
+      if (err instanceof Error && !err.message.includes("Not found")) {
+        console.log("Line 17 - TitleBar.svelte - Navigation error:", err);
+      }
+    }
+  }
+
   function navigateBack() {
     if (currentIndex > 0) {
       currentIndex--;
-      goto(navigationHistory[currentIndex]);
+      handleNavigation(navigationHistory[currentIndex]);
     }
   }
 
   function navigateForward() {
     if (currentIndex < navigationHistory.length - 1) {
       currentIndex++;
-      goto(navigationHistory[currentIndex]);
+      handleNavigation(navigationHistory[currentIndex]);
     }
   }
 
   function navigateHome() {
     if ($page.url.pathname !== "/") {
-      goto("/");
+      handleNavigation("/");
     }
   }
 
@@ -131,6 +143,14 @@
           class="search-input"
         />
       </div>
+      <Button
+        variant="ghost"
+        size="sm"
+        class="title-button"
+        onclick={() => handleNavigation("/this-page-does-not-exist")}
+      >
+        Bad Link
+      </Button>
     </div>
 
     <!-- Right section - Panel controls -->
