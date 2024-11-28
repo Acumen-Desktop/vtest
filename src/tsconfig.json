@@ -9,30 +9,20 @@
 		"skipLibCheck": true,
 		"sourceMap": true,
 		"strict": true,
-		"moduleResolution": "bundler",
-		"composite": true,
-		"declaration": true,
-		"declarationMap": true,
-		"noEmit": false,
-		"outDir": "../dist/src"
+		"moduleResolution": "bundler"
 	},
 	"include": [
 		"../.svelte-kit/ambient.d.ts",
 		"../.svelte-kit/non-ambient.d.ts",
 		"../.svelte-kit/types/**/$types.d.ts",
-		"./lib/**/*.js",
-		"./lib/**/*.ts",
-		"./lib/**/*.svelte",
-		"./routes/**/*.js",
-		"./routes/**/*.ts",
-		"./routes/**/*.svelte",
+		"../src/**/*.js",
+		"../src/**/*.ts",
+		"../src/**/*.svelte",
 		"../tests/**/*.js",
 		"../tests/**/*.ts",
-		"../tests/**/*.svelte"
-	],
-	"exclude": [
-		"../node_modules/**",
-		"./**/*.spec.*",
-		"./**/*.test.*"
+		"../tests/**/*.svelte",
+		"../forge.env.d.ts",
+		"../forge.config.cts",
+		"../electronForgeVitePlugin.cts"
 	]
 }

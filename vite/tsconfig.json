@@ -6,8 +6,7 @@
 		"module": "esnext",
 		"moduleResolution": "bundler",
 		"strict": true,
-		"declaration": true,
-		"declarationMap": true
+		"noEmit": true
 	},
 	"include": [
 		"../forge.env.d.ts",

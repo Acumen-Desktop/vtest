@@ -14,19 +14,13 @@
 		"paths": {
 			"$lib": ["src/lib"],
 			"$lib/*": ["src/lib/*"],
-			"$root/*": ["src/*"],
-			"$panes/*": ["src/lib/components/layout/panes/*"]
+			"$root/*": ["src/*"]
 		},
-		"composite": true
+		"allowImportingTsExtensions": true,
+		"noEmit": true
 	},
 	"include": [
 		"forge.config.cts",
 		"electronForgeVitePlugin.cts",
-		"electron/**/*.ts",
-		"electron/**/*.js"
-	],
-	"references": [
-		{ "path": "./src/tsconfig.json" },
-		{ "path": "./vite/tsconfig.json" }
 	]
 }
