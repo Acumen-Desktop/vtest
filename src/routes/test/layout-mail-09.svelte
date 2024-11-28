@@ -1,5 +1,5 @@
 <script lang="ts">
-  import "../app.css";
+  import "../styles/app.css";
   import TitleBar from "$lib/components/layout/TitleBar.svelte";
   import AppSidebar from "$lib/components/layout/app-sidebar.svelte";
   import * as Breadcrumb from "$lib/components/ui/breadcrumb/index.js";

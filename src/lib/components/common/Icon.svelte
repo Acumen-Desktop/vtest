@@ -1,37 +1,35 @@
 <script lang="ts">
-    // import { onMount } from "svelte";
-    // import { tick } from "svelte";
+  // import { onMount } from "svelte";
+  // import { tick } from "svelte";
 
-    let { name, size = 22, class: className = "" } = $props();
+  let { name, size = 22, class: className = "" } = $props();
 
-    let svg = $state("");
+  let svg = $state("");
 
-    async function loadIcon(iconName: string) {
-        try {
-            const response = await fetch(
-                `/src/lib/assets/icons/${iconName}.svg`,
-            );
-            svg = await response.text();
-        } catch (error) {
-            console.error(`Failed to load icon: ${iconName}`, error);
-        }
+  async function loadIcon(iconName: string) {
+    try {
+      const response = await fetch(`/src/lib/assets/icons-svg/${iconName}.svg`);
+      svg = await response.text();
+    } catch (error) {
+      console.error(`Failed to load icon: ${iconName}`, error);
     }
+  }
 
-    $effect(() => {
-        loadIcon(name);
-    });
+  $effect(() => {
+    loadIcon(name);
+  });
 </script>
 
 <div
-    class="inline-block {className}"
-    style="width: {size}px; height: {size}px;"
+  class="inline-block {className}"
+  style="width: {size}px; height: {size}px;"
 >
-    {@html svg}
+  {@html svg}
 </div>
 
 <style>
-    div :global(svg) {
-        width: 100%;
-        height: 100%;
-    }
+  div :global(svg) {
+    width: 100%;
+    height: 100%;
+  }
 </style>

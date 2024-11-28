@@ -1,5 +1,5 @@
 <script lang="ts">
-  import "$root/app.css";
+  import "$root/styles/app.css";
   import { onMount } from "svelte";
   import TitleBar from "$lib/components/layout/TitleBar.svelte";
   import * as Resizable from "$lib/components/ui/resizable/index.js";

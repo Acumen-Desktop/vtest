@@ -2,16 +2,14 @@
   import { Button } from "$lib/components/ui/button";
   import Devtools from "../buttons/Devtools.svelte";
   import Icon from "$lib/components/common/Icon.svelte";
-  import { Moon, Sun, ChevronLeft, ChevronRight } from "lucide-svelte";
+  import { Moon, Sun, ChevronLeft, ChevronRight, Home } from "lucide-svelte";
   import { page } from "$app/stores";
   import { goto } from "$app/navigation";
 
   let paddingStyle = $state("");
   let isDarkMode = $state(true);
-  let canGoBack = $state(false);
-  let canGoForward = $state(false);
-
   let navigationHistory = $state<string[]>([]);
+  let currentIndex = $state(-1);
 
   $effect(() => {
     const MACOS_CONTROL_WIDTH = 80;
@@ -23,51 +21,41 @@
 
     document.documentElement.classList.add("dark");
 
-    navigationHistory = [window.location.pathname];
+    if (navigationHistory.length === 0) {
+      navigationHistory = [$page.url.pathname];
+      currentIndex = 0;
+    }
   });
 
   $effect(() => {
     const currentPath = $page.url.pathname;
 
-    if (navigationHistory[navigationHistory.length - 1] !== currentPath) {
-      navigationHistory = [...navigationHistory, currentPath];
+    if (currentPath !== navigationHistory[currentIndex]) {
+      navigationHistory = [
+        ...navigationHistory.slice(0, currentIndex + 1),
+        currentPath,
+      ];
+      currentIndex = navigationHistory.length - 1;
     }
-
-    updateNavigationState();
   });
 
-  function updateNavigationState() {
-    const currentIndex = navigationHistory.findIndex(
-      (path) => path === $page.url.pathname
-    );
-
-    canGoBack = currentIndex > 0;
-    canGoForward = currentIndex < navigationHistory.length - 1;
-  }
-
   function navigateBack() {
-    if (canGoBack) {
-      const currentIndex = navigationHistory.findIndex(
-        (path) => path === $page.url.pathname
-      );
-
-      if (currentIndex > 0) {
-        const previousPath = navigationHistory[currentIndex - 1];
-        goto(previousPath);
-      }
+    if (currentIndex > 0) {
+      currentIndex--;
+      goto(navigationHistory[currentIndex]);
     }
   }
 
   function navigateForward() {
-    if (canGoForward) {
-      const currentIndex = navigationHistory.findIndex(
-        (path) => path === $page.url.pathname
-      );
+    if (currentIndex < navigationHistory.length - 1) {
+      currentIndex++;
+      goto(navigationHistory[currentIndex]);
+    }
+  }
 
-      if (currentIndex < navigationHistory.length - 1) {
-        const nextPath = navigationHistory[currentIndex + 1];
-        goto(nextPath);
-      }
+  function navigateHome() {
+    if ($page.url.pathname !== "/") {
+      goto("/");
     }
   }
 
@@ -92,9 +80,20 @@
     <Button
       variant="ghost"
       size="icon"
-      onclick={navigateBack}
-      disabled={!canGoBack}
+      onclick={navigateHome}
+      disabled={$page.url.pathname === "/"}
       class="navigation-button"
+      data-testid="home-button"
+    >
+      <Home size={20} />
+    </Button>
+    <Button
+      variant="ghost"
+      size="icon"
+      onclick={navigateBack}
+      disabled={currentIndex <= 0}
+      class="navigation-button"
+      data-testid="back-button"
     >
       <ChevronLeft size={20} />
     </Button>
@@ -102,8 +101,9 @@
       variant="ghost"
       size="icon"
       onclick={navigateForward}
-      disabled={!canGoForward}
+      disabled={currentIndex >= navigationHistory.length - 1}
       class="navigation-button"
+      data-testid="forward-button"
     >
       <ChevronRight size={20} />
     </Button>
@@ -172,7 +172,7 @@
   }
 
   #commonLeft-section {
-    width: 130px;
+    width: 170px;
     @apply flex items-center justify-between h-full bg-[hsl(var(--background))];
   }
 
@@ -223,7 +223,15 @@
     @apply text-[hsl(var(--secondary-foreground))] hover:bg-neutral-700/50;
   }
 
+  :global(.navigation-button) {
+    @apply transition-opacity duration-200;
+  }
+
   :global(.navigation-button:disabled) {
-    @apply cursor-not-allowed opacity-50;
+    @apply opacity-50 cursor-not-allowed pointer-events-none;
+    /* Remove any hover effects when disabled */
+    &:hover {
+      @apply bg-transparent;
+    }
   }
 </style>

@@ -200,8 +200,26 @@ function updateDocumentation(): void {
       currentDoc.slice(endIndex),
     ].join("");
 
+    // Add new content for console logging
+    const conventionsIndex = currentDoc.indexOf(SECTIONS.CONVENTIONS);
+    const nextSectionIndex = currentDoc.indexOf(SECTIONS.SVELTE5);
+
+    const newConventions = [
+      currentDoc.slice(0, nextSectionIndex),
+      "\n\n### Console Logging\n",
+      "All console.log statements should follow this format:\n",
+      "```typescript\n",
+      'console.log("Line XX - filename - message:", data);\n',
+      "```\n\n",
+      "Example:\n",
+      "```typescript\n",
+      'console.log("Line 17 - +page.svelte - Window visibility update:", data);\n',
+      "```\n\n",
+      currentDoc.slice(nextSectionIndex),
+    ].join("");
+
     // Write the updated documentation
-    writeFileSync(DOCS_PATH, newDoc);
+    writeFileSync(DOCS_PATH, newConventions);
     console.log("✅ Folder structure documentation updated successfully");
   } catch (error) {
     console.error("❌ Error updating folder structure:", error);

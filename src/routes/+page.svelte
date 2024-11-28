@@ -4,7 +4,7 @@
 
 <div id="mainPage" class=" bg-[hsl(var(--background))]">
   <a href="/test">Test Page</a>
-  <a href="/fiveUp">Five Up Page</a>
+  <a href="/five-up">Five Up Page</a>
   <MarkdownEditor />
 </div>
 
