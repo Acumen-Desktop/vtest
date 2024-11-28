@@ -5,7 +5,7 @@
   import { EditorView, basicSetup } from "codemirror";
   import type { Extension } from "@codemirror/state";
 
-  let value = "";
+  let value = $state("");
 
   const extensions: Extension[] = [
     basicSetup,

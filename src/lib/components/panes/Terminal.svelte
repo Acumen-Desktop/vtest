@@ -4,11 +4,15 @@
   import { FitAddon } from "xterm-addon-fit";
   import "xterm/css/xterm.css";
 
-  let terminalElement: HTMLElement;
+  let terminalElement: HTMLElement = $state();
   let terminal: XTerm;
   let fitAddon: FitAddon;
 
-  export let initialText = "$ Welcome to the terminal\n";
+  interface Props {
+    initialText?: string;
+  }
+
+  let { initialText = "$ Welcome to the terminal\n" }: Props = $props();
 
   onMount(() => {
     terminal = new XTerm({

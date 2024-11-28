@@ -3,9 +3,13 @@
   import FileNode from "./FileNode.svelte";
   import type { FileNode as FileNodeType } from "$lib/types/fileExplorer";
 
-  export let rootNode: FileNodeType | null = null;
+  interface Props {
+    rootNode?: FileNodeType | null;
+  }
 
-  let loading = !rootNode;
+  let { rootNode = $bindable(null) }: Props = $props();
+
+  let loading = $state(!rootNode);
 
   onMount(() => {
     if (!rootNode) {

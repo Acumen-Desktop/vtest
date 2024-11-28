@@ -1,5 +1,9 @@
 <script lang="ts">
-  export let message = "Welcome to the application!";
+  interface Props {
+    message?: string;
+  }
+
+  let { message = "Welcome to the application!" }: Props = $props();
 </script>
 
 <div class="welcome-pane">

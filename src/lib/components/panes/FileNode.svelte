@@ -1,23 +1,28 @@
 <script lang="ts">
+  import FileNode_1 from './FileNode.svelte';
   import { ChevronRight, ChevronDown, Folder, File } from "lucide-svelte";
   import type { FileNode } from "$lib/types/fileExplorer";
 
-  export let node: FileNode;
-  export let level: number = 0;
-  export let onToggle: (node: FileNode) => void;
+  interface Props {
+    node: FileNode;
+    level?: number;
+    onToggle: (node: FileNode) => void;
+  }
 
-  $: paddingLeft = `${level * 1.5}rem`;
+  let { node, level = 0, onToggle }: Props = $props();
+
+  let paddingLeft = $derived(`${level * 1.5}rem`);
 </script>
 
 <div class="file-node" style="padding-left: {paddingLeft}">
   <button
     class="flex items-center gap-2 w-full hover:bg-gray-700/50 p-1 rounded"
-    on:click={() => onToggle(node)}
+    onclick={() => onToggle(node)}
   >
     {#if node.type === "directory"}
+      {@const SvelteComponent = node.expanded ? ChevronDown : ChevronRight}
       <span class="icon">
-        <svelte:component
-          this={node.expanded ? ChevronDown : ChevronRight}
+        <SvelteComponent
           class="size-4"
         />
       </span>
@@ -31,7 +36,7 @@
 
   {#if node.type === "directory" && node.expanded}
     {#each node.children || [] as child}
-      <svelte:self node={child} level={level + 1} {onToggle} />
+      <FileNode_1 node={child} level={level + 1} {onToggle} />
     {/each}
   {/if}
 </div>

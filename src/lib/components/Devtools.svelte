@@ -21,7 +21,7 @@
 		}
 	});
 
-	let isDevToolsOpen = false;
+	let isDevToolsOpen = $state(false);
 
 	async function toggleDevtools() {
 		try {

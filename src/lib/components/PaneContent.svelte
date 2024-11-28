@@ -65,7 +65,7 @@
       {#key content.id}
         <div>
           {#if content.component && content.props}
-            <svelte:component this={content.component} {...content.props} />
+            <content.component {...content.props} />
           {/if}
         </div>
       {/key}
